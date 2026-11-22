@@ -1,0 +1,250 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# ClaimClarity AI - Automated Running Sequence & Orchestration Engine
+# Raw Form Swiss Brutalist Edition
+# Usage:
+#   ./runclaim              (Standard startup & web launch)
+#   ./runclaim --test       (Execute 20-test automated verification suite)
+#   ./runclaim --train      (Execute model training sequence)
+#   ./runclaim --port 5002  (Launch server on custom port)
+#   ./runclaim --extension  (Display Chrome extension setup guide)
+#   ./runclaim --help       (Display help & options)
+# ==============================================================================
+
+set -eo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$PROJECT_DIR"
+
+# ANSI Colors for Industrial Terminal Readouts
+BOLD="\033[1m"
+DIM="\033[2m"
+RED="\033[38;5;196m"
+ORANGE="\033[38;5;208m"
+AMBER="\033[38;5;214m"
+GREEN="\033[38;5;46m"
+CYAN="\033[38;5;51m"
+GRAY="\033[38;5;244m"
+RESET="\033[0m"
+
+print_banner() {
+    echo -e "${ORANGE}${BOLD}"
+    echo "  ██████╗██╗      █████╗ ██╗███╗   ███╗ ██████╗██╗      █████╗ ██████╗ ██╗████████╗██╗   ██╗"
+    echo " ██╔════╝██║     ██╔══██╗██║████╗ ████║██╔════╝██║     ██╔══██╗██╔══██╗██║╚══██╔══╝╚██╗ ██╔╝"
+    echo " ██║     ██║     ███████║██║██╔████╔██║██║     ██║     ███████║██████╔╝██║   ██║    ╚████╔╝ "
+    echo " ██║     ██║     ██╔══██║██║██║╚██╔╝██║██║     ██║     ██╔══██║██╔══██╗██║   ██║     ╚██╔╝  "
+    echo " ╚██████╗███████╗██║  ██║██║██║ ╚═╝ ██║╚██████╗███████╗██║  ██║██║  ██║██║   ██║      ██║   "
+    echo "  ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ╚═╝      ╚═╝   "
+    echo -e "${RESET}"
+    echo -e "  ${BOLD}[ SYSTEM NO. 0824 / FORENSIC EVIDENCE REVIEW SUITE / RAW FORM DARK BRUTALISM ]${RESET}"
+    echo -e "  ${DIM}Calibrated Deep Curve Estimation • Multi-Task Appraisal • Neural Vehicle Recognition${RESET}"
+    echo -e "  ${GRAY}──────────────────────────────────────────────────────────────────────────────────────${RESET}"
+}
+
+print_help() {
+    print_banner
+    echo -e "${BOLD}COMMAND-LINE USAGE:${RESET}"
+    echo -e "  ${ORANGE}./runclaim${RESET}                 Start the ClaimClarity AI server and open in browser"
+    echo -e "  ${ORANGE}./runclaim --test${RESET}          Run the complete 20-test verification suite (test_app.py)"
+    echo -e "  ${ORANGE}./runclaim --train${RESET}         Execute the deep neural model training sequence (train.py)"
+    echo -e "  ${ORANGE}./runclaim --port <NUM>${RESET}    Run the web server on a custom port (default: 5001)"
+    echo -e "  ${ORANGE}./runclaim --extension${RESET}     Show setup instructions for the Chromium extension"
+    echo -e "  ${ORANGE}./runclaim --clean${RESET}         Kill existing processes running on port 5001"
+    echo -e "  ${ORANGE}./runclaim --help${RESET}          Show this reference menu"
+    echo ""
+}
+
+print_extension_guide() {
+    print_banner
+    echo -e "${BOLD}CHROMIUM BROWSER EXTENSION (MANIFEST V3) SETUP GUIDE:${RESET}"
+    echo ""
+    echo -e "  ${AMBER}1. Open Browser Extensions Menu:${RESET}"
+    echo -e "     In Google Chrome, Brave, or Microsoft Edge, enter: ${CYAN}chrome://extensions${RESET}"
+    echo ""
+    echo -e "  ${AMBER}2. Enable Developer Mode:${RESET}"
+    echo -e "     In the top-right corner, toggle ${BOLD}'Developer mode'${RESET} to ${GREEN}ON${RESET}."
+    echo ""
+    echo -e "  ${AMBER}3. Load Unpacked Extension:${RESET}"
+    echo -e "     Click the ${BOLD}'Load unpacked'${RESET} button in the top-left corner and select:"
+    echo -e "     ${ORANGE}${PROJECT_DIR}/extension${RESET}"
+    echo ""
+    echo -e "  ${AMBER}4. Pin to Toolbar:${RESET}"
+    echo -e "     Click the Extensions puzzle-piece icon in your toolbar and pin ${BOLD}ClaimClarity AI${RESET}."
+    echo ""
+    echo -e "  ${AMBER}5. Launch Scanner:${RESET}"
+    echo -e "     With the server running (${CYAN}http://127.0.0.1:5001${RESET}), click the extension icon"
+    echo -e "     on any webpage and click ${BOLD}'LAUNCH SCREEN SCANNER'${RESET} to circle any vehicle image."
+    echo ""
+}
+
+# Parse Command-Line Arguments
+PORT="5001"
+MODE="run"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --test|-t)
+            MODE="test"
+            shift
+            ;;
+        --train)
+            MODE="train"
+            shift
+            ;;
+        --extension|-e)
+            MODE="extension"
+            shift
+            ;;
+        --clean|-c)
+            MODE="clean"
+            shift
+            ;;
+        --port|-p)
+            PORT="$2"
+            shift 2
+            ;;
+        --help|-h)
+            print_help
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}[ERROR] Unknown option: $1${RESET}"
+            print_help
+            exit 1
+            ;;
+    esac
+done
+
+if [ "$MODE" = "extension" ]; then
+    print_extension_guide
+    exit 0
+fi
+
+# Step 1: Banner & Header
+print_banner
+
+# Step 2: Handle Port Conflicts if running
+check_and_free_port() {
+    local target_port="$1"
+    local pid=$(lsof -ti :"$target_port" 2>/dev/null || true)
+    if [ -n "$pid" ]; then
+        echo -e "  ${AMBER}[PORT CONFLICT]${RESET} Process ${BOLD}${pid}${RESET} is occupying port ${target_port}."
+        echo -e "  ${AMBER}--> Reclaiming port ${target_port}...${RESET}"
+        kill -9 $pid 2>/dev/null || true
+        sleep 0.5
+        echo -e "  ${GREEN}[✓] Port ${target_port} is now clear.${RESET}"
+    fi
+}
+
+if [ "$MODE" = "clean" ]; then
+    check_and_free_port "$PORT"
+    echo -e "  ${GREEN}[✓] Clean completed successfully.${RESET}"
+    exit 0
+fi
+
+# Step 3: Python Environment Check
+echo -e "  ${BOLD}[STAGE 1/5] VERIFYING PYTHON ENVIRONMENT${RESET}"
+if [ -d ".venv" ]; then
+    echo -e "  ${GREEN}[✓] Virtual environment detected at: .venv${RESET}"
+    source .venv/bin/activate
+elif [ -n "$VIRTUAL_ENV" ]; then
+    echo -e "  ${GREEN}[✓] Active virtual environment: $VIRTUAL_ENV${RESET}"
+else
+    echo -e "  ${ORANGE}[!] Creating virtual environment (.venv)...${RESET}"
+    python3 -m venv .venv
+    source .venv/bin/activate
+    echo -e "  ${ORANGE}[!] Installing dependencies...${RESET}"
+    pip install --upgrade pip
+    pip install torch torchvision numpy opencv-python pillow flask
+fi
+
+PYTHON_EXEC="$(which python3 || which python)"
+echo -e "  ${DIM}Python binary: ${PYTHON_EXEC} ($($PYTHON_EXEC --version))${RESET}"
+
+# Step 4: Hardware Accelerator Verification
+echo ""
+echo -e "  ${BOLD}[STAGE 2/5] HARDWARE ACCELERATOR DETECTION${RESET}"
+ACCEL_INFO=$($PYTHON_EXEC -c "
+import torch
+if torch.backends.mps.is_available():
+    print('MPS (Apple Silicon Metal Performance Shaders) [ACTIVE]')
+elif torch.cuda.is_available():
+    print(f'CUDA GPU: {torch.cuda.get_device_name(0)} [ACTIVE]')
+else:
+    print('CPU Deterministic Fallback [ACTIVE]')
+")
+echo -e "  ${GREEN}[✓] Hardware Engine: ${BOLD}${ACCEL_INFO}${RESET}"
+
+# Step 5: Check Neural Model Checkpoints & Metadata
+echo ""
+echo -e "  ${BOLD}[STAGE 3/5] NEURAL CHECKPOINT AUDIT${RESET}"
+check_file() {
+    local fpath="$1"
+    local desc="$2"
+    if [ -f "$fpath" ]; then
+        local fsize=$(ls -lh "$fpath" | awk '{print $5}')
+        echo -e "  ${GREEN}[✓]${RESET} ${desc}: ${BOLD}${fpath}${RESET} (${fsize})"
+    else
+        echo -e "  ${RED}[✗] Missing checkpoint:${RESET} ${fpath}"
+    fi
+}
+
+check_file "models/claim_dce_model.pth"     "ClaimDCE-Net Curve Estimator"
+check_file "models/multitask_assessor.pth"  "ClaimMultiTaskAssessor (4 Heads)"
+check_file "models/claim_classifier.pth"    "ClaimDamageClassifier (6 Classes)"
+check_file "models/vehicle_recognition.pth" "ClaimVehicleRecognizer (4 Classes)"
+
+# Step 6: Verify Evidence Samples
+echo ""
+echo -e "  ${BOLD}[STAGE 4/5] VERIFYING CALIBRATION EVIDENCE SAMPLES${RESET}"
+if [ ! -d "static/samples" ] || [ $(ls static/samples/*.jpg 2>/dev/null | wc -l) -lt 4 ]; then
+    echo -e "  ${ORANGE}[!] Generating synthetic calibration samples...${RESET}"
+    $PYTHON_EXEC generate_samples.py
+else
+    echo -e "  ${GREEN}[✓] Calibration sample evidence photos mounted in static/samples/${RESET}"
+fi
+
+# Step 7: Mode Execution
+MODE_UPPER=$(echo "$MODE" | tr '[:lower:]' '[:upper:]')
+echo ""
+echo -e "  ${BOLD}[STAGE 5/5] EXECUTING REQUESTED SEQUENCE (${MODE_UPPER})${RESET}"
+echo -e "  ${GRAY}──────────────────────────────────────────────────────────────────────────────────────${RESET}"
+
+if [ "$MODE" = "test" ]; then
+    echo -e "  ${ORANGE}[RUNNING AUTOMATED 20-TEST VERIFICATION SUITE]${RESET}"
+    echo ""
+    $PYTHON_EXEC -m unittest test_app.py
+    echo ""
+    echo -e "  ${GREEN}${BOLD}[✓] VERIFICATION SUITE COMPLETED SUCCESSFULLY${RESET}"
+    exit 0
+fi
+
+if [ "$MODE" = "train" ]; then
+    echo -e "  ${ORANGE}[EXECUTING NEURAL TRAINING SEQUENCE]${RESET}"
+    echo ""
+    $PYTHON_EXEC train.py
+    exit 0
+fi
+
+# Standard Launch Sequence
+check_and_free_port "$PORT"
+
+export PORT="$PORT"
+echo ""
+echo -e "  ${GREEN}${BOLD}ClaimClarity AI Engine is LIVE and listening at:${RESET}"
+echo -e "  ${CYAN}${BOLD}>>> http://127.0.0.1:${PORT}${RESET}"
+echo ""
+echo -e "  ${DIM}• Default Engine: Calibrated Classic CLAHE (Deterministic LAB)${RESET}"
+echo -e "  ${DIM}• Neural Models: ClaimDCE-Net + MultiTaskAssessor + VehicleRecognizer${RESET}"
+echo -e "  ${DIM}• Chromium Extension: Ready for unpack load from ./extension${RESET}"
+echo -e "  ${DIM}• Press [Ctrl+C] to gracefully terminate the server.${RESET}"
+echo -e "  ${GRAY}──────────────────────────────────────────────────────────────────────────────────────${RESET}"
+echo ""
+
+# Auto-open browser on macOS if running interactively
+if [[ "$OSTYPE" == "darwin"* ]] && [ -t 0 ]; then
+    (sleep 1.5 && open "http://127.0.0.1:${PORT}" 2>/dev/null || true) &
+fi
+
+# Execute Flask Web Application
+exec $PYTHON_EXEC app.py
