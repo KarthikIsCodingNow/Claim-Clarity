@@ -1,0 +1,434 @@
+/* ==========================================================================
+   ClaimClarity AI - Raw Form Brutalist Design System
+   Base: #E4E2DD | Primary: #1E1E1E | Accent Red: #DB4A2B
+   Warm Orange: #F8A348 | Soft Pink: #FF89A9 | Campaign: #D9D6D0
+   Typography: Clash Display & Satoshi
+   ========================================================================== */
+
+/* Typography definition */
+body {
+  background-color: #E4E2DD;
+  color: #1E1E1E;
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-clash {
+  font-family: 'Clash Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.05em;
+  line-height: 0.75;
+}
+
+.font-satoshi {
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Text Selection */
+::selection {
+  background-color: #DB4A2B;
+  color: #FFFFFF;
+}
+
+::-moz-selection {
+  background-color: #DB4A2B;
+  color: #FFFFFF;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E4E2DD;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DB4A2B;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1E1E1E;
+}
+
+/* ==========================================================================
+   Global Entrance Animation
+   Slide-up entrance using cubic-bezier(0.16, 1, 0.3, 1) over 0.8s
+   ========================================================================== */
+.animate-raw-entrance {
+  animation: rawSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes rawSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Animated Gradient Blobs (60vw x 60vw, blur(140px), mix-blend-mode: multiply)
+   ========================================================================== */
+.raw-blob {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  filter: blur(140px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+  transform-origin: center center;
+}
+
+.blob-red {
+  background: radial-gradient(circle, #DB4A2B 0%, rgba(219, 74, 43, 0) 70%);
+  animation: blobPulseRed 14s infinite alternate ease-in-out;
+}
+
+.blob-orange {
+  background: radial-gradient(circle, #F8A348 0%, rgba(248, 163, 72, 0) 70%);
+  animation: blobPulseOrange 12s infinite alternate ease-in-out;
+}
+
+.blob-pink {
+  background: radial-gradient(circle, #FF89A9 0%, rgba(255, 137, 169, 0) 70%);
+  animation: blobPulsePink 16s infinite alternate ease-in-out;
+}
+
+@keyframes blobPulseRed {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate(4vw, -3vw) scale(1.08);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-3vw, 5vw) scale(0.95);
+    opacity: 0.70;
+  }
+}
+
+@keyframes blobPulseOrange {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-5vw, 4vw) scale(1.12);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(3vw, -4vw) scale(0.98);
+    opacity: 0.65;
+  }
+}
+
+@keyframes blobPulsePink {
+  0% {
+    transform: translate(0, 0) scale(0.95);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-3vw, -2vw) scale(1.05);
+    opacity: 0.75;
+  }
+}
+
+/* ==========================================================================
+   Special Component: Interactive CTA Button
+   Rectangular, no border-radius. Background #1E1E1E, text #E4E2DD.
+   On hover, white background slides left-to-right (transform -100% to 0).
+   Text transitions to #DB4A2B. Duration: 0.3s ease-out.
+   ========================================================================== */
+.btn-raw {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1E1E1E;
+  color: #E4E2DD;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0 !important;
+  border: 1px solid #1E1E1E;
+  padding: 16px 32px;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.3s ease-out, border-color 0.3s ease-out;
+  text-decoration: none;
+}
+
+.btn-raw::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #FFFFFF;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.btn-raw:hover {
+  color: #DB4A2B;
+  border-color: #1E1E1E;
+}
+
+.btn-raw:hover::before {
+  transform: translateX(0);
+}
+
+.btn-raw:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Secondary Button / Outline Variant */
+.btn-raw-outline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: #1E1E1E;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0 !important;
+  border: 1px solid #1E1E1E;
+  padding: 14px 28px;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.3s ease-out;
+}
+
+.btn-raw-outline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #1E1E1E;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.btn-raw-outline:hover {
+  color: #E4E2DD;
+}
+
+.btn-raw-outline:hover::before {
+  transform: translateX(0);
+}
+
+/* Small brutalist button */
+.btn-raw-sm {
+  padding: 8px 16px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+/* ==========================================================================
+   Navigation mix-blend-difference on mobile
+   ========================================================================== */
+@media (max-width: 768px) {
+  .nav-mobile-blend {
+    mix-blend-mode: difference;
+    color: #FFFFFF;
+  }
+}
+
+/* ==========================================================================
+   Product Grid Hover States
+   Items: 3/4 aspect ratio images with subtle hover scale (1.05).
+   Product names: bold uppercase Satoshi, 14px, tracking 0.15em.
+   Price in #444444.
+   Hover state triggers #FF89A9 color shift on title.
+   ========================================================================== */
+.product-card {
+  cursor: pointer;
+  background: transparent;
+}
+
+.product-card .img-wrapper {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  position: relative;
+  background-color: #D9D6D0;
+  border: 1px solid #1E1E1E;
+}
+
+.product-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+.product-card .product-title {
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.15em;
+  color: #1E1E1E;
+  transition: color 0.3s ease-out;
+}
+
+.product-card:hover .product-title {
+  color: #FF89A9;
+}
+
+.product-card .product-price {
+  color: #444444;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.product-card.active .img-wrapper {
+  border: 2px solid #DB4A2B;
+  box-shadow: 4px 4px 0 #1E1E1E;
+}
+
+/* ==========================================================================
+   Brutalist Image Comparison Slider
+   ========================================================================== */
+#split-view {
+  position: relative;
+  user-select: none;
+  touch-action: pan-y;
+  background-color: #1E1E1E;
+}
+
+#split-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+  clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+}
+
+#split-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #DB4A2B;
+  z-index: 20;
+  cursor: ew-resize;
+  transform: translateX(-50%);
+}
+
+.split-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #1E1E1E;
+  color: #E4E2DD;
+  border: 1px solid #DB4A2B;
+  padding: 6px 12px;
+  font-family: 'Clash Display', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 #DB4A2B;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+#split-handle:hover .split-badge {
+  transform: translate(-50%, -50%) scale(1.1);
+  background-color: #DB4A2B;
+  color: #FFFFFF;
+}
+
+/* Loupe Lens */
+#loupe-lens {
+  position: fixed;
+  width: 200px;
+  height: 200px;
+  border: 2px solid #DB4A2B;
+  border-radius: 0;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+  background-color: #1E1E1E;
+  box-shadow: 6px 6px 0 #1E1E1E;
+  cursor: crosshair;
+}
+
+/* Category Divider faint radial gradient (#F8A348/20%) */
+.category-divider-bg {
+  background: radial-gradient(ellipse at center, rgba(248, 163, 72, 0.25) 0%, rgba(228, 226, 221, 0) 70%);
+}
+
+/* Brutalist Drop Zone */
+#drop-zone {
+  border: 2px dashed #1E1E1E;
+  background-color: rgba(228, 226, 221, 0.6);
+  transition: all 0.2s ease;
+}
+
+#drop-zone:hover, #drop-zone.dragover {
+  border-color: #DB4A2B;
+  background-color: rgba(248, 163, 72, 0.15);
+}
+
+/* Thin Divider */
+.raw-divider {
+  border-bottom: 1px solid rgba(30, 30, 30, 0.2);
+}
+
+/* Circular Arrow Icon */
+.circle-arrow-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #1E1E1E;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1E1E1E;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: transparent;
+}
+
+.circle-arrow-btn:hover {
+  background-color: #1E1E1E;
+  color: #E4E2DD;
+  transform: translate(2px, -2px);
+}

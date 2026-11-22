@@ -1,0 +1,48 @@
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+secrets/
+
+# Python Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Datasets & Large Archives
+datasets/
+*.zip
+*.tar.gz
+
+# Model checkpoints (large binary weights)
+models/*.pth
+!models/model_metadata.json
+
+# Operating System & Editor Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs & Temporary files
+*.log
+scratch/

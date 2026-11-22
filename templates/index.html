@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLAIMCLARITY — RAW FORM EVIDENCE CLARITY</title>
+
+  <!-- Typography: Clash Display & Satoshi via Fontshare -->
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600,500&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rawBase: '#E4E2DD',
+            rawPrimary: '#1E1E1E',
+            rawAccent: '#DB4A2B',
+            rawOrange: '#F8A348',
+            rawPink: '#FF89A9',
+            rawCampaign: '#D9D6D0',
+          },
+          fontFamily: {
+            clash: ['Clash Display', 'sans-serif'],
+            satoshi: ['Satoshi', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="bg-[#E4E2DD] text-[#1E1E1E] font-satoshi antialiased selection:bg-[#DB4A2B] selection:text-white">
+
+  <!-- ========================================================================
+       Navigation (Minimalist fixed navigation)
+       Left: Brand logo in 'Clash Display' (bold, uppercase, 2xl)
+       Center: Text links in Satoshi (medium, 14px, tracked out 0.1em)
+       Right: Icon set (Search, Bag) using 20px Lucide icons
+       Apply mix-blend-difference on mobile; standard dark text on desktop.
+       ======================================================================== -->
+  <nav class="fixed top-0 left-0 right-0 z-50 h-20 px-6 lg:px-12 flex items-center justify-between border-b border-[#1E1E1E]/20 bg-[#E4E2DD]/90 backdrop-blur-md transition-all">
+    <!-- Left: Brand Logo in Clash Display (bold, uppercase, 2xl) -->
+    <a href="#" class="font-clash font-bold text-2xl uppercase tracking-tight text-[#1E1E1E] nav-mobile-blend flex items-center space-x-2">
+      <span>CLAIMCLARITY</span>
+      <span class="w-2.5 h-2.5 bg-[#DB4A2B] inline-block"></span>
+    </a>
+
+    <!-- Center: Text links in Satoshi (medium, 14px, tracked out 0.1em) -->
+    <div class="hidden md:flex items-center space-x-8 text-[14px] font-medium tracking-[0.1em] text-[#1E1E1E] uppercase">
+      <a href="#evidence-lab" class="hover:text-[#DB4A2B] transition-colors">EVIDENCE LAB</a>
+      <a href="#product-grid" class="hover:text-[#DB4A2B] transition-colors">SCENARIOS</a>
+      <a href="#pipeline-spec" class="hover:text-[#DB4A2B] transition-colors">PIPELINE</a>
+      <a href="javascript:void(0)" id="nav-btn-audit" class="hover:text-[#DB4A2B] transition-colors flex items-center space-x-1">
+        <span>AUDIT LOG</span>
+      </a>
+    </div>
+
+    <!-- Right: Icon Set (Search, Bag) using 20px Lucide icons -->
+    <div class="flex items-center space-x-5 text-[#1E1E1E] nav-mobile-blend">
+      <button id="btn-quick-search" class="hover:text-[#DB4A2B] transition-colors" title="Search Claim Records">
+        <i data-lucide="search" class="w-5 h-5"></i>
+      </button>
+      <button id="btn-quick-bag" class="hover:text-[#DB4A2B] transition-colors relative" title="Evidence Dossier / Toolkit">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+        <span id="nav-badge-count" class="absolute -top-1.5 -right-2 bg-[#DB4A2B] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-none">6</span>
+      </button>
+      <a href="#evidence-lab" class="hidden sm:inline-flex btn-raw btn-raw-sm">
+        EVALUATE
+      </a>
+    </div>
+  </nav>
+
+  <!-- ========================================================================
+       Hero Section
+       Full viewport height.
+       Background features three large, blurred blobs in #DB4A2B and #F8A348 pulsing slowly.
+       Headline: 'Clash Display', 18vw size, uppercase, line-height 0.75, with second line indented 15vw.
+       Subtext: Max-width 400px, 20px font size.
+       CTA: Primary solid black button with white hover slide-in effect;
+            Secondary text link in #DB4A2B with arrow icon.
+       ======================================================================== -->
+  <section class="relative min-h-screen w-full flex flex-col justify-between pt-28 pb-12 px-6 lg:px-12 overflow-hidden border-b border-[#1E1E1E]/20">
+    
+    <!-- Three Animated Gradient Blobs (60vw x 60vw, blur 140px, mix-blend-mode: multiply) -->
+    <div class="raw-blob blob-red -top-[10vw] -left-[10vw]"></div>
+    <div class="raw-blob blob-orange top-[20vw] -right-[15vw]"></div>
+    <div class="raw-blob blob-pink bottom-[-15vw] left-[20vw]"></div>
+
+    <!-- Top Meta Indicators -->
+    <div class="relative z-10 flex flex-wrap items-center justify-between text-xs uppercase tracking-[0.2em] text-[#1E1E1E]/80 pt-4 animate-raw-entrance">
+      <div class="flex items-center space-x-3">
+        <span class="w-2 h-2 bg-[#DB4A2B]"></span>
+        <span class="font-bold">SYSTEM NO. 0824 / FORENSIC CLARITY ENGINE</span>
+      </div>
+      <div class="hidden sm:block">
+        <span>DIMENSION PRESERVED 1:1 • DETERMINISTIC LAB CLAHE</span>
+      </div>
+    </div>
+
+    <!-- Main Typographic Headline: 18vw, leading 0.75, 2nd line indented 15vw -->
+    <div class="relative z-10 my-auto py-8 animate-raw-entrance" style="animation-delay: 0.1s;">
+      <h1 class="font-clash font-bold text-[18vw] uppercase leading-[0.75] tracking-[-0.05em] text-[#1E1E1E] select-none">
+        <span class="block">CLAIM</span>
+        <span class="block ml-[15vw] text-[#1E1E1E]">CLARITY</span>
+      </h1>
+    </div>
+
+    <!-- Hero Subtext & Actions Bottom Stack -->
+    <div class="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-end pt-6 border-t border-[#1E1E1E]/20 animate-raw-entrance" style="animation-delay: 0.2s;">
+      
+      <!-- Subtext: Max-width 400px, 20px font size -->
+      <div class="md:col-span-6 lg:col-span-5">
+        <p class="max-w-[400px] text-[20px] font-normal leading-snug text-[#1E1E1E]">
+          High-contrast forensic photo clarity for insurance adjusters. Revealing hairline scratches, hail dings, and shadow details without generative hallucination.
+        </p>
+      </div>
+
+      <!-- Hero CTAs: Primary solid black with white slide-in; Secondary in #DB4A2B with arrow -->
+      <div class="md:col-span-6 lg:col-span-7 flex flex-wrap items-center md:justify-end gap-6">
+        <a href="#evidence-lab" class="btn-raw">
+          <span>ENHANCE CLAIM PHOTO</span>
+        </a>
+        <a href="#product-grid" class="inline-flex items-center space-x-2 text-[#DB4A2B] font-bold text-[14px] uppercase tracking-[0.15em] hover:text-[#1E1E1E] transition-colors group">
+          <span>BROWSE 6 SCENARIOS</span>
+          <span class="transform group-hover:translate-x-1.5 transition-transform duration-200">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Compliance Notice / Regulatory Stamp
+       ======================================================================== -->
+  <section class="border-b border-[#1E1E1E] bg-[#D9D6D0] px-6 lg:px-12 py-5">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs tracking-wider">
+      <div class="flex items-center space-x-3">
+        <span class="px-2 py-1 bg-[#1E1E1E] text-[#E4E2DD] font-bold font-clash uppercase text-[11px]">STATUTORY NOTICE</span>
+        <span class="font-bold text-[#DB4A2B]">REVIEW SUPPORT ONLY</span>
+      </div>
+      <p class="text-[#1E1E1E] max-w-4xl text-[12px] leading-relaxed">
+        Enhanced imagery is an assistive visual aid to support human adjuster appraisal. It is <strong class="underline">not a replacement</strong> for original evidentiary photos and does <strong class="underline">not constitute an automated claim decision</strong>. Untouched original files remain archived with cryptographic SHA-256 integrity hashes.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Category Divider 01
+       Full-width section with 128px vertical padding (py-32).
+       Background contains a faint radial gradient (#F8A348/20%).
+       Headline: 'Clash Display', 12vw, uppercase, tracking-tighter, slightly transparent (opacity 0.9).
+       ======================================================================== -->
+  <section class="relative w-full py-32 px-6 lg:px-12 border-b border-[#1E1E1E] category-divider-bg overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="font-clash font-bold text-[12vw] uppercase tracking-[-0.05em] leading-[0.75] text-[#1E1E1E] opacity-90 select-none">
+        01 / EVIDENCE LAB
+      </h2>
+      <p class="text-xs uppercase tracking-[0.25em] text-[#444444] mt-4 font-bold">
+        INTERACTIVE ADJUSTER WORKSPACE • BILATERAL DENOISE • CLAHE CONTRAST • 1:1 RESOLUTION LOCK
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Evidence Lab Workspace (Interactive Core Tool)
+       Upload, Preview, Single Enhance CTA, Stepped Progress,
+       Interactive Draggable Split Slider, Side-by-Side, 2.5x Loupe, Export
+       ======================================================================== -->
+  <section id="evidence-lab" class="w-full px-6 lg:px-12 py-16 border-b border-[#1E1E1E]">
+    <div class="max-w-7xl mx-auto space-y-12">
+
+      <!-- Workspace Control Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Upload / Evidence Drop Zone (8 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="border border-[#1E1E1E] bg-[#E4E2DD] p-8 shadow-[8px_8px_0_#1E1E1E]">
+            
+            <div class="flex items-center justify-between border-b border-[#1E1E1E] pb-4 mb-6">
+              <span class="font-clash font-bold text-lg uppercase tracking-tight">INPUT EVIDENCE</span>
+              <span class="text-xs font-mono uppercase text-[#444444]">JPG / PNG / WEBP &bull; MAX 32MB</span>
+            </div>
+
+            <!-- Drop Zone (Thick dashed brutalist border) -->
+            <div id="drop-zone" class="relative group p-12 text-center cursor-pointer min-h-[220px] flex flex-col items-center justify-center">
+              <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+              
+              <div class="w-16 h-16 border border-[#1E1E1E] bg-[#E4E2DD] flex items-center justify-center text-[#1E1E1E] group-hover:bg-[#DB4A2B] group-hover:text-white transition-all mb-4">
+                <i data-lucide="upload" class="w-7 h-7"></i>
+              </div>
+              <p class="font-clash font-bold text-xl uppercase tracking-tight text-[#1E1E1E] group-hover:text-[#DB4A2B] transition-colors">
+                DROP CLAIM EVIDENCE PHOTO HERE
+              </p>
+              <p class="text-xs text-[#444444] tracking-wider uppercase mt-2">
+                OR CLICK TO BROWSE LOCAL FILESYSTEM
+              </p>
+            </div>
+
+            <!-- Selected File Metadata Bar -->
+            <div id="file-meta-pill" class="hidden mt-4 p-4 border border-[#1E1E1E] bg-[#D9D6D0] flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-3 overflow-hidden">
+                <span class="w-2 h-2 bg-[#DB4A2B]"></span>
+                <span id="file-name" class="font-bold text-[#1E1E1E] uppercase truncate max-w-xs">EVIDENCE_PHOTO.JPG</span>
+                <span id="file-size" class="text-[#444444] font-mono">1.4 MB</span>
+              </div>
+              <button id="btn-clear-file" class="font-bold uppercase tracking-wider text-[#DB4A2B] hover:text-[#1E1E1E] transition-colors" title="Clear evidence photo">
+                [ REMOVE ]
+              </button>
+            </div>
+
+            <!-- Neural Enhancement Mode Selector -->
+            <div class="mt-6 pt-4 border-t border-[#1E1E1E]">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[#1E1E1E] flex items-center space-x-1.5">
+                  <span class="w-2 h-2 bg-[#DB4A2B]"></span>
+                  <span>ENHANCEMENT ENGINE</span>
+                </span>
+                <span class="text-[10px] font-mono text-[#DB4A2B] font-bold">PYTORCH MPS ACCELERATED</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <button type="button" class="mode-select-btn px-2.5 py-2 border border-[#1E1E1E] bg-[#1E1E1E] text-[#E4E2DD] font-bold uppercase tracking-wider text-[11px] text-center transition-all" data-mode="neural_dce">
+                  NEURAL DCE (TRAINED)
+                </button>
+                <button type="button" class="mode-select-btn px-2.5 py-2 border border-[#1E1E1E] bg-transparent text-[#1E1E1E] hover:bg-[#D9D6D0] font-bold uppercase tracking-wider text-[11px] text-center transition-all" data-mode="hybrid_forensic">
+                  HYBRID (+SCRATCH)
+                </button>
+                <button type="button" class="mode-select-btn px-2.5 py-2 border border-[#1E1E1E] bg-transparent text-[#1E1E1E] hover:bg-[#D9D6D0] font-bold uppercase tracking-wider text-[11px] text-center transition-all" data-mode="classic_clahe">
+                  CLASSIC CLAHE
+                </button>
+              </div>
+            </div>
+
+            <!-- Single "Enhance" Action Button (The Interactive CTA Button Component) -->
+            <div class="mt-6 pt-6 border-t border-[#1E1E1E] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <button id="btn-enhance" disabled class="btn-raw w-full sm:w-auto text-center">
+                <span id="btn-enhance-text">ENHANCE FOR CLAIM REVIEW</span>
+              </button>
+              <div class="text-[11px] uppercase tracking-widest text-[#444444] text-right font-medium">
+                <div>Edge-Gated Noise Isolation</div>
+                <div class="text-[#DB4A2B]">Zero Grain Amplification</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right Column: Status & Directives (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="border border-[#1E1E1E] bg-[#D9D6D0] p-8 shadow-[8px_8px_0_#1E1E1E] space-y-6">
+            
+            <div class="flex items-center justify-between border-b border-[#1E1E1E] pb-4">
+              <span class="font-clash font-bold text-lg uppercase tracking-tight">EVALUATION METRICS</span>
+              <span id="status-badge" class="px-2.5 py-0.5 bg-[#1E1E1E] text-[#E4E2DD] text-[10px] font-bold uppercase tracking-widest">
+                AWAITING INPUT
+              </span>
+            </div>
+
+            <div class="space-y-4 text-xs uppercase tracking-wider">
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">ACTIVE MODEL:</span>
+                <span id="metric-model" class="font-bold text-[#1E1E1E]">CLAIMDCE-NET (TRAINED)</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">TRAINING LOSS:</span>
+                <span id="metric-loss" class="font-bold text-[#DB4A2B] font-mono">1.7275 (12 EPOCHS)</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">NOISE CONTROL:</span>
+                <span class="font-bold text-[#1E1E1E]">EDGE-GATED (NO GRAIN BOOST)</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">DIMENSION LOCK:</span>
+                <span id="metric-dim" class="font-bold text-[#1E1E1E]">100% PRESERVED</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">PROCESSING LATENCY:</span>
+                <span id="metric-time" class="font-bold text-[#DB4A2B] font-mono">-- MS</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">CHROMATICITY (A/B):</span>
+                <span class="font-bold text-[#1E1E1E]">LOCKED (0 PAINT SHIFT)</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-[#1E1E1E]/20 pb-2">
+                <span class="text-[#444444]">SHA-256 FINGERPRINT:</span>
+                <span id="metric-hash" class="font-mono text-[#1E1E1E] truncate max-w-[140px]">--</span>
+              </div>
+            </div>
+
+            <!-- Keyboard shortcut hint -->
+            <div class="p-4 bg-[#E4E2DD] border border-[#1E1E1E] text-[11px] leading-relaxed">
+              <strong class="text-[#DB4A2B]">QUICK ADJUSTER TIP:</strong> Hold the <kbd class="px-1.5 py-0.5 bg-[#1E1E1E] text-white font-mono font-bold text-[10px]">SPACEBAR</kbd> at any point to instantly reveal the untouched original photo.
+            </div>
+
+            <div class="pt-2">
+              <button id="btn-show-audit" class="btn-raw-outline w-full text-center">
+                <span>VIEW FULL FORENSIC AUDIT TRAIL</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Stepped Progress State Container (Dynamic) -->
+      <div id="progress-container" class="hidden border-2 border-[#DB4A2B] bg-[#E4E2DD] p-8 shadow-[8px_8px_0_#DB4A2B] space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="w-3 h-3 bg-[#DB4A2B] animate-ping"></span>
+            <div>
+              <h3 id="progress-status-title" class="font-clash font-bold text-xl uppercase tracking-tight text-[#1E1E1E]">ENHANCING CLAIM PHOTO...</h3>
+              <p id="progress-status-sub" class="text-xs uppercase tracking-wider text-[#444444]">APPLYING DETERMINISTIC CLARITY PIPELINE</p>
+            </div>
+          </div>
+          <span id="progress-pct" class="font-clash font-bold text-2xl text-[#DB4A2B]">45%</span>
+        </div>
+
+        <!-- Brutalist progress track -->
+        <div class="w-full h-3 border border-[#1E1E1E] bg-[#D9D6D0] overflow-hidden">
+          <div id="progress-bar-fill" class="h-full bg-[#DB4A2B] transition-all duration-300 w-1/3"></div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2 text-[11px] uppercase tracking-wider font-bold">
+          <div id="step-1" class="text-[#444444]">01. VERIFY DIMENSIONS</div>
+          <div id="step-2" class="text-[#444444]">02. BILATERAL DENOISE</div>
+          <div id="step-3" class="text-[#444444]">03. LAB CLAHE CONTRAST</div>
+          <div id="step-4" class="text-[#444444]">04. UNSHARP MASK</div>
+        </div>
+      </div>
+
+      <!-- Error State Alert -->
+      <div id="error-alert" class="hidden border-2 border-[#DB4A2B] bg-[#DB4A2B]/10 p-6 flex items-start justify-between">
+        <div class="flex items-start space-x-4">
+          <span class="px-2 py-1 bg-[#DB4A2B] text-white font-clash font-bold uppercase text-xs">ERROR</span>
+          <div>
+            <h4 class="font-bold text-sm text-[#1E1E1E] uppercase tracking-wide">PROCESSING FAILED</h4>
+            <p id="error-message" class="text-xs text-[#444444] mt-1 font-mono">Invalid payload or processing error.</p>
+          </div>
+        </div>
+        <button id="btn-dismiss-error" class="text-[#1E1E1E] hover:text-[#DB4A2B] font-bold text-sm">
+          [ DISMISS ]
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           Comparison Viewport (Curtain Split Slider & Side-by-Side Modes)
+           ==================================================================== -->
+      <div id="workspace-section" class="border border-[#1E1E1E] bg-[#E4E2DD] p-6 lg:p-8 shadow-[8px_8px_0_#1E1E1E] space-y-6">
+        
+        <!-- Viewport Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#1E1E1E] pb-4">
+          
+          <div class="flex items-center space-x-3">
+            <span class="font-clash font-bold text-base uppercase tracking-tight">VIEWPORT</span>
+            
+            <!-- Mode Switch: Split Curtain vs Side-by-Side -->
+            <div class="inline-flex border border-[#1E1E1E]">
+              <button id="view-mode-split" class="px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#1E1E1E] text-[#E4E2DD] transition-all">
+                CURTAIN SLIDER
+              </button>
+              <button id="view-mode-side" class="px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-transparent text-[#1E1E1E] hover:bg-[#D9D6D0] transition-all">
+                SIDE BY SIDE
+              </button>
+            </div>
+          </div>
+
+          <!-- Secondary Toolbar Actions -->
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="btn-hold-compare" disabled class="btn-raw-outline btn-raw-sm" title="Press & hold or use Spacebar">
+              HOLD TO REVEAL ORIGINAL
+            </button>
+            <button id="btn-toggle-loupe" disabled class="btn-raw-outline btn-raw-sm" title="Toggle 2.5x inspection magnifier">
+              2.5X LOUPE
+            </button>
+            <button id="btn-download-enhanced" disabled class="btn-raw btn-raw-sm">
+              DOWNLOAD ENHANCED
+            </button>
+            <button id="btn-download-proof" disabled class="btn-raw-outline btn-raw-sm" title="Export formal side-by-side assessment sheet">
+              EXPORT PROOF SHEET
+            </button>
+            <button id="btn-download-orig" disabled class="btn-raw-outline btn-raw-sm" title="Download untouched original file">
+              ORIGINAL
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Display Viewport Frame -->
+        <div id="viewport-container" class="relative w-full border border-[#1E1E1E] bg-[#1E1E1E] min-h-[500px] flex items-center justify-center overflow-hidden select-none">
+          
+          <!-- Empty State Placeholder -->
+          <div id="empty-state" class="text-center p-12 max-w-lg space-y-4">
+            <div class="w-16 h-16 border border-[#E4E2DD]/40 mx-auto flex items-center justify-center text-[#E4E2DD]">
+              <i data-lucide="image" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-clash font-bold text-2xl uppercase tracking-tight text-[#E4E2DD]">NO EVIDENCE MOUNTED</h3>
+            <p class="text-xs text-[#E4E2DD]/70 uppercase tracking-widest leading-relaxed">
+              Upload a vehicle or damage photo above, or select one of the 6 claim scenarios below to initialize the inspection workspace.
+            </p>
+          </div>
+
+          <!-- 1. Interactive Split Slider View (Default) -->
+          <div id="split-view" class="hidden relative w-full h-full flex items-center justify-center overflow-hidden min-h-[500px]">
+            
+            <!-- Base Image: Enhanced / Review Aid -->
+            <img id="img-enhanced" src="" alt="Enhanced Review Aid" class="max-h-[680px] w-auto max-w-full object-contain pointer-events-none block mx-auto">
+
+            <!-- Overlay Container: Original / Untouched Evidence with clip-path -->
+            <div id="split-overlay" class="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
+              <img id="img-original-split" src="" alt="Original Evidence" class="max-h-[680px] w-auto max-w-full object-contain block mx-auto">
+            </div>
+
+            <!-- Draggable Split Handle (Accent Red #DB4A2B) -->
+            <div id="split-handle" class="absolute top-0 bottom-0 cursor-ew-resize" style="left: 50%;">
+              <div class="split-badge">
+                <span>&larr; SLIDE TO COMPARE &rarr;</span>
+              </div>
+            </div>
+
+            <!-- Corner Identification Badges -->
+            <div class="absolute top-4 left-4 z-30 pointer-events-none">
+              <span class="px-3 py-1 bg-[#1E1E1E] text-[#E4E2DD] text-[10px] font-bold font-clash uppercase tracking-wider border border-[#E4E2DD]/30">
+                ORIGINAL UNTOUCHED EVIDENCE
+              </span>
+            </div>
+            <div class="absolute top-4 right-4 z-30 pointer-events-none">
+              <span class="px-3 py-1 bg-[#DB4A2B] text-white text-[10px] font-bold font-clash uppercase tracking-wider">
+                ENHANCED REVIEW AID (CLAHE)
+              </span>
+            </div>
+          </div>
+
+          <!-- 2. Side-by-Side Dual View -->
+          <div id="side-view" class="hidden w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#1E1E1E]">
+            <!-- Left: Original -->
+            <div class="border border-[#E4E2DD]/20 bg-[#141414] flex flex-col">
+              <div class="p-3 border-b border-[#E4E2DD]/20 flex items-center justify-between text-xs text-[#E4E2DD]">
+                <span class="font-clash font-bold uppercase">ORIGINAL UNTOUCHED</span>
+                <span id="side-orig-dim" class="font-mono text-[10px] text-[#888888]">-- X --</span>
+              </div>
+              <div class="p-4 flex-1 flex items-center justify-center min-h-[380px]">
+                <img id="img-original-side" src="" alt="Original evidence" class="max-h-[520px] w-auto max-w-full object-contain">
+              </div>
+            </div>
+
+            <!-- Right: Enhanced -->
+            <div class="border border-[#DB4A2B] bg-[#141414] flex flex-col">
+              <div class="p-3 border-b border-[#DB4A2B]/40 bg-[#DB4A2B]/10 flex items-center justify-between text-xs text-[#E4E2DD]">
+                <span class="font-clash font-bold uppercase text-[#DB4A2B]">ENHANCED FOR REVIEW</span>
+                <span id="side-enh-dim" class="font-mono text-[10px] text-[#DB4A2B]">-- X --</span>
+              </div>
+              <div class="p-4 flex-1 flex items-center justify-center min-h-[380px]">
+                <img id="img-enhanced-side" src="" alt="Enhanced review aid" class="max-h-[520px] w-auto max-w-full object-contain">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Pre-Enhancement Single Preview -->
+          <div id="preview-single-view" class="hidden relative w-full h-full flex flex-col items-center justify-center p-6 bg-[#1E1E1E]">
+            <div class="absolute top-4 left-4 z-20">
+              <span class="px-3 py-1 bg-[#1E1E1E] text-[#E4E2DD] text-[10px] font-bold font-clash uppercase tracking-wider border border-[#E4E2DD]/30">
+                ORIGINAL PREVIEW (READY FOR ENHANCEMENT)
+              </span>
+            </div>
+            <img id="img-single-preview" src="" alt="Preview photo" class="max-h-[600px] w-auto max-w-full object-contain border border-[#E4E2DD]/20">
+          </div>
+
+          <!-- 2.5x Loupe Magnifier Lens -->
+          <div id="loupe-lens" class="hidden">
+            <div id="loupe-content" class="w-full h-full relative">
+              <img id="loupe-img" src="" alt="Magnified detail" class="absolute max-w-none">
+            </div>
+            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#DB4A2B] text-white font-clash font-bold text-[9px] uppercase tracking-wider">
+              2.5X LOUPE
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Category Divider 02
+       Full-width section with 128px vertical padding (py-32).
+       Background contains a faint radial gradient (#F8A348/20%).
+       Headline: 'Clash Display', 12vw, uppercase, tracking-tighter, slightly transparent (opacity 0.9).
+       Right-aligned in sequence.
+       ======================================================================== -->
+  <section class="relative w-full py-32 px-6 lg:px-12 border-b border-[#1E1E1E] category-divider-bg overflow-hidden">
+    <div class="max-w-7xl mx-auto text-right">
+      <h2 class="font-clash font-bold text-[12vw] uppercase tracking-[-0.05em] leading-[0.75] text-[#1E1E1E] opacity-90 select-none">
+        02 / SCENARIOS
+      </h2>
+      <p class="text-xs uppercase tracking-[0.25em] text-[#444444] mt-4 font-bold">
+        SIX SYNTHETIC &amp; FORENSIC DAMAGE CASES &bull; CLICK ANY CASE TO MOUNT IN EVIDENCE LAB
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Product Grid (Scenario Archive)
+       Responsive grid (1 col mobile, 3 col desktop) with 16px horizontal and 64px vertical gap.
+       Items: 3/4 aspect ratio images with subtle hover scale (1.05).
+       Metadata: Product names in bold uppercase Satoshi, 14px, tracking 0.15em.
+       Price in #444444.
+       Hover state triggers an #FF89A9 color shift on title.
+       ======================================================================== -->
+  <section id="product-grid" class="w-full px-6 lg:px-12 py-20 border-b border-[#1E1E1E]">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Responsive grid: 1 col mobile, 3 col desktop, 16px horizontal gap (gap-x-4), 64px vertical gap (gap-y-16) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-16">
+        
+        {% for s in samples %}
+        <div class="product-card group" data-sample-id="{{ s.id }}">
+          
+          <!-- 3/4 Aspect Ratio Image Container with subtle hover scale (1.05) -->
+          <div class="img-wrapper">
+            <img src="{{ s.path }}" alt="{{ s.title }}" loading="lazy">
+            <div class="absolute top-3 left-3 bg-[#1E1E1E] text-[#E4E2DD] px-2 py-1 font-clash text-[10px] font-bold uppercase tracking-wider">
+              {{ s.badge }}
+            </div>
+            <div class="absolute bottom-3 right-3 bg-[#E4E2DD] text-[#1E1E1E] px-2 py-0.5 font-mono text-[10px] uppercase font-bold border border-[#1E1E1E]">
+              {{ s.ref }}
+            </div>
+          </div>
+
+          <!-- Metadata: Product names in bold uppercase Satoshi, 14px, tracking 0.15em. Price in #444444. Hover triggers #FF89A9. -->
+          <div class="mt-4 space-y-1">
+            <div class="flex items-center justify-between">
+              <h3 class="product-title">{{ s.title }}</h3>
+              <span class="product-price">{{ s.price }}</span>
+            </div>
+            <p class="text-xs text-[#444444] line-clamp-2 leading-relaxed">
+              {{ s.description }}
+            </p>
+            <div class="pt-2 flex items-center justify-between text-[11px] font-bold tracking-widest uppercase text-[#DB4A2B] group-hover:text-[#FF89A9] transition-colors">
+              <span>MOUNT CASE &rarr;</span>
+              <span class="text-[#444444] font-mono">{{ s.category }}</span>
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Category Divider 03
+       Full-width section with 128px vertical padding (py-32).
+       Background contains faint radial gradient (#F8A348/20%).
+       Headline: 'Clash Display', 12vw, uppercase, tracking-tighter, slightly transparent (opacity 0.9).
+       ======================================================================== -->
+  <section class="relative w-full py-32 px-6 lg:px-12 border-b border-[#1E1E1E] category-divider-bg overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="font-clash font-bold text-[12vw] uppercase tracking-[-0.05em] leading-[0.75] text-[#1E1E1E] opacity-90 select-none">
+        03 / PIPELINE
+      </h2>
+      <p class="text-xs uppercase tracking-[0.25em] text-[#444444] mt-4 font-bold">
+        DETERMINISTIC PROCESSING SPECIFICATION &bull; C++ OPENCV ACCELERATION &bull; ZERO GENERATIVE NOISE
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Campaign Block
+       Section background #D9D6D0. 12-column grid.
+       Left 8 cols: 'Clash Display' headline at 6vw, leading 0.9.
+       Right 4 cols: Vertical stack featuring thin dividers (#1E1E1E/20%)
+                     and 'Read More' links with arrow-up-right icons inside circular borders.
+       ======================================================================== -->
+  <section id="pipeline-spec" class="w-full bg-[#D9D6D0] border-b border-[#1E1E1E] px-6 lg:px-12 py-24">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Left 8 cols: 'Clash Display' headline at 6vw, leading 0.9 -->
+      <div class="lg:col-span-8 space-y-6">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-[#DB4A2B] block">
+          FORENSIC ACCURACY CHARTER
+        </span>
+        <h2 class="font-clash font-bold text-[6vw] uppercase leading-[0.9] tracking-[-0.05em] text-[#1E1E1E]">
+          CONSERVATIVE EVIDENCE ENHANCEMENT. ZERO GENERATIVE HALLUCINATION.
+        </h2>
+        <p class="text-base text-[#1E1E1E] max-w-2xl leading-relaxed">
+          Insurance claims demand uncompromised chain of custody. ClaimClarity rejects generative diffusion and texture inpainting in favor of calibrated, non-linear histogram equalization and edge-preserving filters.
+        </p>
+      </div>
+
+      <!-- Right 4 cols: Vertical stack featuring thin dividers (#1E1E1E/20%) and 'Read More' links with circular arrow-up-right icons -->
+      <div class="lg:col-span-4 flex flex-col justify-between space-y-6">
+        
+        <!-- Item 1 -->
+        <div class="raw-divider pb-4 flex items-center justify-between group cursor-pointer" onclick="document.getElementById('nav-btn-audit').click()">
+          <div>
+            <span class="text-[10px] font-bold uppercase text-[#444444] block">STAGE 01</span>
+            <h4 class="font-clash font-bold text-lg uppercase tracking-tight text-[#1E1E1E] group-hover:text-[#DB4A2B] transition-colors">
+              BILATERAL DENOISING
+            </h4>
+            <p class="text-xs text-[#444444] mt-0.5">Edge-preserving high-ISO grain suppression</p>
+          </div>
+          <div class="circle-arrow-btn">
+            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="raw-divider pb-4 flex items-center justify-between group cursor-pointer" onclick="document.getElementById('nav-btn-audit').click()">
+          <div>
+            <span class="text-[10px] font-bold uppercase text-[#444444] block">STAGE 02</span>
+            <h4 class="font-clash font-bold text-lg uppercase tracking-tight text-[#1E1E1E] group-hover:text-[#DB4A2B] transition-colors">
+              LAB CLAHE CONTRAST
+            </h4>
+            <p class="text-xs text-[#444444] mt-0.5">Luminance equalized; paint hues locked</p>
+          </div>
+          <div class="circle-arrow-btn">
+            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="raw-divider pb-4 flex items-center justify-between group cursor-pointer" onclick="document.getElementById('nav-btn-audit').click()">
+          <div>
+            <span class="text-[10px] font-bold uppercase text-[#444444] block">STAGE 03</span>
+            <h4 class="font-clash font-bold text-lg uppercase tracking-tight text-[#1E1E1E] group-hover:text-[#DB4A2B] transition-colors">
+              1:1 DIMENSION LOCK
+            </h4>
+            <p class="text-xs text-[#444444] mt-0.5">Strict pixel aspect &amp; size preservation</p>
+          </div>
+          <div class="circle-arrow-btn">
+            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="raw-divider pb-4 flex items-center justify-between group cursor-pointer" onclick="document.getElementById('nav-btn-audit').click()">
+          <div>
+            <span class="text-[10px] font-bold uppercase text-[#444444] block">STAGE 04</span>
+            <h4 class="font-clash font-bold text-lg uppercase tracking-tight text-[#1E1E1E] group-hover:text-[#DB4A2B] transition-colors">
+              SHA-256 AUDIT LOG
+            </h4>
+            <p class="text-xs text-[#444444] mt-0.5">Cryptographic chain of custody record</p>
+          </div>
+          <div class="circle-arrow-btn">
+            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Footer
+       Background #1E1E1E, text #E4E2DD. 4-column layout.
+       Column 1: Large brand logo and social icons.
+       Columns 2-3: Link lists in 14px Satoshi.
+       Bottom section: Massive year indicator ('2024') in background-style text (#FFFFFF/10%)
+       at 10vw size, right-aligned copyright notice.
+       ======================================================================== -->
+  <footer class="bg-[#1E1E1E] text-[#E4E2DD] pt-20 pb-12 border-t border-[#1E1E1E]">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+      
+      <!-- 4-Column Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-[#E4E2DD]/20">
+        
+        <!-- Column 1: Large Brand Logo & Social/System Icons (5 cols) -->
+        <div class="md:col-span-5 space-y-6">
+          <a href="#" class="font-clash font-bold text-4xl uppercase tracking-tight text-[#E4E2DD] block">
+            CLAIMCLARITY<span class="text-[#DB4A2B]">.</span>AI
+          </a>
+          <p class="text-sm text-[#E4E2DD]/70 max-w-sm leading-relaxed">
+            Raw Form Brutalist Evidence Clarity System. Engineered for automobile, property, and casualty insurance claims investigation.
+          </p>
+          <div class="flex items-center space-x-4 pt-2 text-[#E4E2DD]">
+            <a href="#" class="w-10 h-10 border border-[#E4E2DD]/30 flex items-center justify-center hover:bg-[#DB4A2B] hover:border-[#DB4A2B] transition-colors" title="Repository">
+              <i data-lucide="github" class="w-4 h-4"></i>
+            </a>
+            <a href="#" class="w-10 h-10 border border-[#E4E2DD]/30 flex items-center justify-center hover:bg-[#DB4A2B] hover:border-[#DB4A2B] transition-colors" title="Documentation">
+              <i data-lucide="file-text" class="w-4 h-4"></i>
+            </a>
+            <a href="#" class="w-10 h-10 border border-[#E4E2DD]/30 flex items-center justify-center hover:bg-[#DB4A2B] hover:border-[#DB4A2B] transition-colors" title="Security & Compliance">
+              <i data-lucide="shield" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Column 2: Link list in 14px Satoshi (2 cols) -->
+        <div class="md:col-span-2 space-y-4">
+          <span class="font-clash font-bold text-xs uppercase tracking-widest text-[#DB4A2B] block">NAVIGATION</span>
+          <ul class="space-y-2.5 text-[14px] text-[#E4E2DD]/80">
+            <li><a href="#evidence-lab" class="hover:text-[#DB4A2B] transition-colors">EVIDENCE LAB</a></li>
+            <li><a href="#product-grid" class="hover:text-[#DB4A2B] transition-colors">CLAIM SCENARIOS</a></li>
+            <li><a href="#pipeline-spec" class="hover:text-[#DB4A2B] transition-colors">PIPELINE CHARTER</a></li>
+            <li><a href="/health" target="_blank" class="hover:text-[#DB4A2B] transition-colors">SYSTEM STATUS</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Link list in 14px Satoshi (2 cols) -->
+        <div class="md:col-span-2 space-y-4">
+          <span class="font-clash font-bold text-xs uppercase tracking-widest text-[#DB4A2B] block">STANDARDS</span>
+          <ul class="space-y-2.5 text-[14px] text-[#E4E2DD]/80">
+            <li><a href="javascript:void(0)" class="hover:text-[#DB4A2B] transition-colors">CHAIN OF CUSTODY</a></li>
+            <li><a href="javascript:void(0)" class="hover:text-[#DB4A2B] transition-colors">CLAHE ALGORITHM</a></li>
+            <li><a href="javascript:void(0)" class="hover:text-[#DB4A2B] transition-colors">REGULATORY DISCLOSURE</a></li>
+            <li><a href="javascript:void(0)" class="hover:text-[#DB4A2B] transition-colors">GUIDEWIRE INTEGRATION</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: System Metrics (3 cols) -->
+        <div class="md:col-span-3 space-y-4">
+          <span class="font-clash font-bold text-xs uppercase tracking-widest text-[#DB4A2B] block">ENGINE SPEC</span>
+          <div class="p-4 border border-[#E4E2DD]/20 bg-[#141414] text-xs font-mono space-y-2 text-[#E4E2DD]/80">
+            <div>RUNTIME: OPENCV 5.1.0 (ARM64)</div>
+            <div>PALETTE: #E4E2DD / #1E1E1E / #DB4A2B</div>
+            <div>DIMENSION DRIFT: 0.00% ENFORCED</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Section: Massive Year Indicator ('2024') in background-style text (#FFFFFF/10%) at 10vw size, right-aligned copyright -->
+      <div class="pt-12 flex flex-col md:flex-row items-baseline justify-between gap-6 overflow-hidden">
+        
+        <!-- Massive year indicator ('2024') in #FFFFFF/10% at 10vw size -->
+        <div class="font-clash font-bold text-[10vw] leading-[0.75] text-white/10 select-none tracking-[-0.05em]">
+          2024
+        </div>
+
+        <!-- Right-aligned copyright notice -->
+        <div class="text-right text-xs text-[#E4E2DD]/60 uppercase tracking-widest space-y-1">
+          <div>&copy; 2024 CLAIMCLARITY AI. ALL RIGHTS RESERVED.</div>
+          <div class="text-[#DB4A2B]">REVIEW SUPPORT ONLY &bull; NOT AN AUTOMATED CLAIM DECISION</div>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       Forensic Audit Modal / Drawer (Raw Form Brutalist Style)
+       ======================================================================== -->
+  <div id="audit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1E1E]/80 backdrop-blur-sm">
+    <div class="bg-[#E4E2DD] border-2 border-[#1E1E1E] max-w-2xl w-full p-8 shadow-[12px_12px_0_#1E1E1E] space-y-6 max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-[#1E1E1E] pb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#DB4A2B]">EVIDENCE CHAIN OF CUSTODY</span>
+          <h3 class="font-clash font-bold text-2xl uppercase tracking-tight text-[#1E1E1E]">FORENSIC AUDIT RECORD</h3>
+        </div>
+        <button id="btn-close-audit" class="font-clash font-bold text-lg text-[#1E1E1E] hover:text-[#DB4A2B]">
+          [ CLOSE ]
+        </button>
+      </div>
+
+      <!-- Dynamic Audit Content -->
+      <div id="audit-content" class="space-y-4 text-xs">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="pt-4 border-t border-[#1E1E1E] flex justify-end">
+        <button id="btn-dismiss-audit" class="btn-raw btn-raw-sm">
+          DISMISS AUDIT LOG
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
