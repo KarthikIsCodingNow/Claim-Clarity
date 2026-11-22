@@ -37,7 +37,7 @@ ClaimClarity AI adopts the **Raw Form** design system: a high-contrast Swiss Bru
   - `12vw` section breaks with faint `#F8A348/20%` radial gradients.
   - 12-column campaign section with a `6vw` headline and circular arrow links.
 - **Footer:**
-  - Dark `#1E1E1E` footer with a massive `10vw` background year indicator (`2024` at 10% opacity).
+  - Dark `#1E1E1E` footer with a massive `10vw` background year indicator (`2026` at 10% opacity).
 
 ---
 

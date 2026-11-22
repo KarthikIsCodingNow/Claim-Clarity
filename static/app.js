@@ -86,6 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const loupeImg = document.getElementById('loupe-img');
   const productCards = document.querySelectorAll('.product-card');
 
+  // HTML Sanitization against XSS ("1. Script in username")
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Format File Size
   function formatBytes(bytes, decimals = 1) {
     if (bytes === 0) return '0 Bytes';
@@ -138,8 +149,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function handleFileSelected(file) {
-    if (!file.type.startsWith('image/')) {
-      showError('Selected file is not an image. Please provide a valid JPEG, PNG, or WEBP photo.');
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+    const lowerName = (file.name || '').toLowerCase();
+    const hasValidExt = validExtensions.some(ext => lowerName.endsWith(ext));
+
+    if (!file.type.startsWith('image/') || !hasValidExt) {
+      showError('Selected file is not an authentic photo. Only JPEG, PNG, and WEBP formats are accepted.');
+      return;
+    }
+
+    if (file.size > 32 * 1024 * 1024) {
+      showError('File exceeds maximum permitted upload limit (32MB).');
       return;
     }
 
@@ -148,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.selectedFile = file;
     state.selectedSampleId = null;
 
-    fileNameEl.textContent = file.name.toUpperCase();
+    fileNameEl.textContent = escapeHtml(file.name.toUpperCase());
     fileSizeEl.textContent = formatBytes(file.size);
     fileMetaPill.classList.remove('hidden');
 
@@ -655,12 +675,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const meta = state.currentMetadata;
     const modelSpecs = meta.model_specs || {};
-    let stagesHtml = meta.pipeline_stages.map(s => `
+    let stagesHtml = (meta.pipeline_stages || []).map(s => `
       <div class="flex items-start space-x-3 p-3 border border-[#1E1E1E] bg-[#D9D6D0]">
-        <span class="px-2 py-0.5 bg-[#DB4A2B] text-white font-clash font-bold text-xs">${s.step}</span>
+        <span class="px-2 py-0.5 bg-[#DB4A2B] text-white font-clash font-bold text-xs">${escapeHtml(s.step)}</span>
         <div>
-          <div class="font-clash font-bold text-sm uppercase text-[#1E1E1E]">${s.title}</div>
-          <div class="text-xs text-[#444444] mt-0.5">${s.description}</div>
+          <div class="font-clash font-bold text-sm uppercase text-[#1E1E1E]">${escapeHtml(s.title)}</div>
+          <div class="text-xs text-[#444444] mt-0.5">${escapeHtml(s.description)}</div>
         </div>
       </div>
     `).join('');
@@ -673,16 +693,16 @@ document.addEventListener('DOMContentLoaded', () => {
             DEEP LEARNING MODEL
           </span>
           <span class="text-[11px] font-mono text-[#DB4A2B] font-bold uppercase">
-            ACCELERATOR: ${meta.device || 'MPS'}
+            ACCELERATOR: ${escapeHtml(meta.device || 'MPS')}
           </span>
         </div>
         <div class="font-clash font-bold text-lg uppercase text-[#1E1E1E]">
-          ${modelSpecs.architecture || 'ClaimDCE-Net (Deep Curve Estimation Network)'}
+          ${escapeHtml(modelSpecs.architecture || 'ClaimDCE-Net (Deep Curve Estimation Network)')}
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[10px] uppercase font-bold text-[#444444]">
-          <div>PARAMS: <span class="text-[#1E1E1E]">${modelSpecs.parameters || '79,422'}</span></div>
-          <div>EPOCHS: <span class="text-[#1E1E1E]">${modelSpecs.trained_epochs || '12'}</span></div>
-          <div>FINAL LOSS: <span class="text-[#DB4A2B]">${modelSpecs.final_loss || '1.7275'}</span></div>
+          <div>PARAMS: <span class="text-[#1E1E1E]">${escapeHtml(modelSpecs.parameters || '79,422')}</span></div>
+          <div>EPOCHS: <span class="text-[#1E1E1E]">${escapeHtml(modelSpecs.trained_epochs || '12')}</span></div>
+          <div>FINAL LOSS: <span class="text-[#DB4A2B]">${escapeHtml(modelSpecs.final_loss || '1.7275')}</span></div>
           <div>DATASET: <span class="text-[#1E1E1E]">CAR DAMAGE (HF)</span></div>
         </div>
       </div>
@@ -690,12 +710,12 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="grid grid-cols-2 gap-4 p-4 border border-[#1E1E1E] bg-[#D9D6D0]">
         <div>
           <span class="text-[10px] font-bold uppercase text-[#444444]">DIMENSION SPECIFICATION</span>
-          <div class="font-clash font-bold text-xl text-[#1E1E1E]">${meta.dimensions.width} × ${meta.dimensions.height} PX</div>
+          <div class="font-clash font-bold text-xl text-[#1E1E1E]">${escapeHtml(meta.dimensions?.width)} × ${escapeHtml(meta.dimensions?.height)} PX</div>
           <span class="text-[10px] text-[#DB4A2B] font-bold uppercase">100% PRESERVED (0 CROPPING)</span>
         </div>
         <div>
           <span class="text-[10px] font-bold uppercase text-[#444444]">INFERENCE TIME</span>
-          <div class="font-clash font-bold text-xl text-[#DB4A2B] font-mono">${meta.processing_time_ms} MS</div>
+          <div class="font-clash font-bold text-xl text-[#DB4A2B] font-mono">${escapeHtml(meta.processing_time_ms)} MS</div>
           <span class="text-[10px] text-[#444444] uppercase">PYTORCH METAL SHADERS</span>
         </div>
       </div>
@@ -703,8 +723,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="space-y-2">
         <span class="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]">CRYPTOGRAPHIC CHAIN OF CUSTODY (SHA-256)</span>
         <div class="p-3 border border-[#1E1E1E] bg-[#D9D6D0] font-mono text-[11px] space-y-1.5 break-all">
-          <div><strong class="text-[#1E1E1E]">ORIGINAL HASH:</strong> ${meta.original_sha256}</div>
-          <div><strong class="text-[#DB4A2B]">ENHANCED HASH:</strong> ${meta.enhanced_sha256}</div>
+          <div><strong class="text-[#1E1E1E]">ORIGINAL HASH:</strong> ${escapeHtml(meta.original_sha256)}</div>
+          <div><strong class="text-[#DB4A2B]">ENHANCED HASH:</strong> ${escapeHtml(meta.enhanced_sha256)}</div>
         </div>
       </div>
 
@@ -716,8 +736,9 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
 
       <div class="p-4 border border-[#DB4A2B] bg-[#DB4A2B]/10 text-xs text-[#1E1E1E] leading-relaxed">
-        <strong class="font-clash uppercase font-bold text-[#DB4A2B]">REGULATORY CHARTER:</strong> ${meta.disclaimer}
+        <strong class="font-clash uppercase font-bold text-[#DB4A2B]">REGULATORY CHARTER:</strong> ${escapeHtml(meta.disclaimer)}
       </div>
+    `;
     `;
         <strong class="font-clash uppercase font-bold text-[#DB4A2B]">REGULATORY CHARTER:</strong> ${meta.disclaimer}
       </div>

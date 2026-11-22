@@ -143,6 +143,68 @@ class TestClaimClarityPipeline(unittest.TestCase):
         self.assertEqual(res.content_type, "image/png")
         self.assertGreater(len(res.data), 1000)
 
+    # =========================================================================
+    # Security Audit & Year Fix Test Cases
+    # =========================================================================
+
+    def test_actual_year_2026_in_footer(self):
+        """Verify footer renders current actual year 2026 instead of 2024."""
+        res = self.client.get("/")
+        self.assertEqual(res.status_code, 200)
+        html = res.data.decode("utf-8")
+        self.assertIn("2026", html)
+        self.assertIn("&copy; 2026 CLAIMCLARITY AI", html)
+        # Verify 2024 is no longer rendered in the copyright notice
+        self.assertNotIn("&copy; 2024", html)
+
+    def test_admin_route_restricted(self):
+        """Verify /admin access returns 403 Forbidden."""
+        res = self.client.get("/admin")
+        self.assertEqual(res.status_code, 403)
+        data = res.get_json()
+        self.assertEqual(data["code"], "ACCESS_DENIED")
+
+    def test_not_a_photo_magic_bytes_check(self):
+        """Verify upload of non-photo payload disguised as image fails signature check."""
+        fake_payload = b"<html><script>alert(1)</script></html>"
+        data = {
+            "file": (io.BytesIO(fake_payload), "malicious.jpg")
+        }
+        res = self.client.post("/api/enhance", data=data, content_type="multipart/form-data")
+        self.assertEqual(res.status_code, 400)
+        payload = res.get_json()
+        self.assertIn("File signature does not match", payload["error"])
+
+    def test_sample_id_path_traversal_blocked(self):
+        """Verify URL id tampering and path traversal are rejected by sample whitelist."""
+        res = self.client.post("/api/enhance", json={"sample_id": "../../etc/passwd"})
+        self.assertEqual(res.status_code, 400)
+        payload = res.get_json()
+        self.assertIn("Unauthorized or unknown", payload["error"])
+
+    def test_security_headers_enforced(self):
+        """Verify defense-in-depth security headers on responses."""
+        res = self.client.get("/")
+        self.assertEqual(res.headers.get("X-Content-Type-Options"), "nosniff")
+        self.assertEqual(res.headers.get("X-Frame-Options"), "DENY")
+        self.assertIn("Content-Security-Policy", res.headers)
+
+    def test_rate_limiting_enforced(self):
+        """Verify rate limiter blocks spamming (>35 req/min)."""
+        import app as app_module
+        app_module.ip_request_history.clear()
+
+        # Send 35 requests (allowed)
+        for _ in range(35):
+            res = self.client.post("/api/enhance", json={"sample_id": "car_door_scratch.jpg"})
+            self.assertEqual(res.status_code, 200)
+
+        # 36th request must be blocked with 429
+        blocked_res = self.client.post("/api/enhance", json={"sample_id": "car_door_scratch.jpg"})
+        self.assertEqual(blocked_res.status_code, 429)
+        self.assertEqual(blocked_res.get_json()["code"], "RATE_LIMIT_EXCEEDED")
+        app_module.ip_request_history.clear()
+
 
 if __name__ == "__main__":
     unittest.main()
