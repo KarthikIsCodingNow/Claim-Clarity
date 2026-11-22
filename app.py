@@ -12,7 +12,7 @@ import uuid
 import logging
 import threading
 from collections import defaultdict
-from typing import Tuple
+from typing import Tuple, Optional
 
 from flask import Flask, render_template, request, jsonify, send_file
 from enhancer import ClaimPhotoEnhancer
@@ -28,6 +28,27 @@ enhancer = ClaimPhotoEnhancer()
 
 # Concurrency throttling to protect GPU/MPS memory from flood attacks
 INFERENCE_SEMAPHORE = threading.Semaphore(4)
+
+# Tabular claims actuarial ledger cache
+CLAIMS_CSV_PATH = os.path.join(os.path.dirname(__file__), "datasets", "claim-images", "archive", "insurance_claims_dataset.csv")
+_claims_cache = None
+_claims_cache_lock = threading.Lock()
+
+def get_claims_cache():
+    global _claims_cache
+    with _claims_cache_lock:
+        if _claims_cache is None:
+            _claims_cache = []
+            if os.path.exists(CLAIMS_CSV_PATH):
+                import csv
+                try:
+                    with open(CLAIMS_CSV_PATH, "r", encoding="utf-8") as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            _claims_cache.append(row)
+                except Exception as e:
+                    logger.error(f"Failed to load claims CSV: {e}")
+        return _claims_cache
 
 # In-memory sliding window rate limiter (35 requests / minute per client IP)
 REQUEST_WINDOW_SECONDS = 60
@@ -157,6 +178,39 @@ SAMPLES = [
 ]
 
 VALID_SAMPLE_IDS = {s["id"] for s in SAMPLES}
+VALID_SAMPLE_IDS.update({
+    "low1.jpeg", "low2.jpg", "low3.jpg", "low4.jpg", "low5.jpeg",
+    "testapp/low1.jpeg", "testapp/low2.jpg", "testapp/low3.jpg", "testapp/low4.jpg", "testapp/low5.jpeg"
+})
+
+
+def resolve_sample_path(sample_id: str) -> Optional[str]:
+    """Safely resolve sample path across static/samples, static/samples/testapp, and testapp."""
+    clean_id = os.path.basename(sample_id)
+    candidate_paths = [
+        os.path.join(app.static_folder, "samples", clean_id),
+        os.path.join(app.static_folder, "samples", "testapp", clean_id),
+        os.path.join("testapp", "low quality", clean_id),
+        os.path.join("testapp", "low", clean_id),
+        os.path.join("testapp", "high quality", clean_id),
+        os.path.join("testapp", "high", clean_id),
+        os.path.join(app.static_folder, "samples", sample_id)
+    ]
+    for p in candidate_paths:
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+@app.before_request
+def handle_cors_preflight():
+    """Handle CORS preflight requests for browser extension and client integrations."""
+    if request.method == "OPTIONS" and request.path.startswith("/api/"):
+        response = app.make_default_options_response()
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+        return response
 
 
 @app.after_request
@@ -174,6 +228,10 @@ def apply_security_headers(response):
         "img-src 'self' data: blob:; "
         "connect-src 'self';"
     )
+    if request.path.startswith("/api/"):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
     return response
 
 
@@ -212,6 +270,157 @@ def get_model_info():
     })
 
 
+@app.route("/api/classifier-info", methods=["GET"])
+def get_classifier_info():
+    meta = dict(enhancer.classifier_metadata or {})
+    if "classes" not in meta and "tasks" in meta and "damage_mode" in meta["tasks"]:
+        meta["classes"] = meta["tasks"]["damage_mode"]["classes"]
+    return jsonify({
+        "status": "ready" if enhancer.classifier_model is not None else "initializing",
+        "device": str(enhancer.device),
+        "model_architecture": meta.get("model_architecture", "ClaimMultiTaskAssessor"),
+        "weights_path": "models/multitask_assessor.pth",
+        "metadata": meta
+    })
+
+
+@app.route("/api/claims/search", methods=["GET"])
+def search_claims():
+    client_ip = request.remote_addr or "127.0.0.1"
+    if is_rate_limited(client_ip):
+        return jsonify({"error": "Rate limit exceeded. Please wait a moment."}), 429
+
+    query = request.args.get("q", "").strip().lower()
+    claim_type = request.args.get("type", "").strip().lower()
+    limit = min(int(request.args.get("limit", 15)), 50)
+
+    claims = get_claims_cache()
+    if not claims:
+        return jsonify({"claims": [], "total_matches": 0, "total_dataset_records": 0})
+
+    results = []
+    for c in claims:
+        if query:
+            match = (
+                query in c.get("Claim_ID", "").lower()
+                or query in c.get("Policy_Number", "").lower()
+                or query in c.get("Customer_ID", "").lower()
+                or query in c.get("Claim_Type", "").lower()
+                or query in c.get("Claim_Status", "").lower()
+            )
+            if not match:
+                continue
+        if claim_type and c.get("Claim_Type", "").lower() != claim_type:
+            continue
+
+        results.append(c)
+        if len(results) >= limit:
+            break
+
+    return jsonify({
+        "total_matches": len(results),
+        "total_dataset_records": len(claims),
+        "claims": results
+    })
+
+
+@app.route("/api/claims/<claim_id>", methods=["GET"])
+def get_claim_detail(claim_id):
+    claim_id_clean = os.path.basename(claim_id.strip()).upper()
+    claims = get_claims_cache()
+    for c in claims:
+        if c.get("Claim_ID", "").upper() == claim_id_clean:
+            return jsonify({"success": True, "claim": c})
+    return jsonify({"error": f"Claim record '{claim_id}' not found in actuarial ledger."}), 404
+
+
+def extract_image_payload_from_request(req) -> Tuple[Optional[bytes], str, str, Optional[str]]:
+    """
+    Universally extracts image bytes, source filename, mode, and any error message
+    from multipart/form-data, JSON payloads, URL-encoded forms, or raw base64.
+    Returns: (image_bytes, source_name, mode, error_message)
+    """
+    mode = "classic_clahe"
+    source_name = "uploaded_photo.png"
+
+    # 1. Check file uploads in req.files
+    if req.files:
+        uploaded_file = None
+        for key in ["file", "image", "photo", "evidence", "upload"]:
+            if key in req.files and req.files[key].filename:
+                uploaded_file = req.files[key]
+                break
+        if not uploaded_file:
+            first_file = next(iter(req.files.values()), None)
+            if first_file and first_file.filename:
+                uploaded_file = first_file
+
+        if uploaded_file:
+            raw_bytes = uploaded_file.read()
+            is_valid, err_msg = validate_image_payload(raw_bytes, uploaded_file.filename or "upload.png")
+            if not is_valid:
+                return None, "", "", err_msg
+            target_mode = req.form.get("mode") or req.args.get("mode") or mode
+            return raw_bytes, os.path.basename(uploaded_file.filename), target_mode, None
+
+    # 2. Extract from JSON, form, or query parameters
+    json_data = req.get_json(silent=True) or {}
+    form_data = req.form or {}
+    combined = {}
+    if isinstance(json_data, dict):
+        combined.update(json_data)
+    if form_data:
+        combined.update(form_data.to_dict())
+
+    target_mode = combined.get("mode") or req.args.get("mode") or mode
+
+    # Check for sample_id scenario
+    if "sample_id" in combined:
+        sample_id = combined["sample_id"]
+        if sample_id not in VALID_SAMPLE_IDS:
+            return None, "", "", "Unauthorized or unknown claim scenario identifier."
+        sample_path = resolve_sample_path(sample_id)
+        if not sample_path or not os.path.exists(sample_path):
+            return None, "", "", "Sample evidence file not found on disk."
+        try:
+            with open(sample_path, "rb") as f:
+                return f.read(), sample_id, target_mode, None
+        except Exception as e:
+            return None, "", "", f"Failed to read sample file: {str(e)}"
+
+    # Check for base64 image data under any key (snake_case or camelCase)
+    b64_data = None
+    for key in ["image_base64", "imageBase64", "image", "dataUrl", "data_url", "screenshot", "photo", "payload", "file_base64"]:
+        if key in combined and combined[key]:
+            b64_data = combined[key]
+            break
+
+    # Raw body fallback
+    if not b64_data and req.data:
+        try:
+            raw_str = req.data.decode("utf-8", errors="ignore").strip()
+            if raw_str.startswith("data:image/") or not raw_str.startswith("{"):
+                b64_data = raw_str
+        except Exception:
+            pass
+
+    if b64_data and isinstance(b64_data, str):
+        if "," in b64_data:
+            b64_data = b64_data.split(",", 1)[1]
+        b64_data = b64_data.strip()
+        try:
+            raw_bytes = base64.b64decode(b64_data)
+        except Exception:
+            return None, "", "", "Malformed base64 image data."
+
+        is_valid, err_msg = validate_image_payload(raw_bytes, "upload.png")
+        if not is_valid:
+            return None, "", "", err_msg
+        return raw_bytes, source_name, target_mode, None
+
+    return None, "", "", "No image payload provided. Please upload a file or select a scenario."
+
+
 @app.route("/api/enhance", methods=["POST"])
 def enhance_photo():
     client_ip = request.remote_addr or "127.0.0.1"
@@ -225,62 +434,9 @@ def enhance_photo():
         }), 429
 
     try:
-        image_bytes = None
-        source_name = "uploaded_photo.png"
-        mode = "neural_dce"
-
-        # Check for direct file upload
-        if "file" in request.files:
-            file = request.files["file"]
-            if file.filename == "":
-                return jsonify({"error": "No file was selected for upload."}), 400
-            
-            raw_bytes = file.read()
-            # Strict file validation (magic bytes, size, dimensions)
-            is_valid, err_msg = validate_image_payload(raw_bytes, file.filename)
-            if not is_valid:
-                return jsonify({"error": err_msg}), 400
-
-            image_bytes = raw_bytes
-            source_name = os.path.basename(file.filename)
-            mode = request.form.get("mode", "neural_dce")
-
-        # Check for sample scenario selection (Strict Whitelist Check)
-        elif request.is_json and "sample_id" in request.json:
-            sample_id = request.json["sample_id"]
-            if sample_id not in VALID_SAMPLE_IDS:
-                return jsonify({"error": "Unauthorized or unknown claim scenario identifier."}), 400
-
-            sample_path = os.path.join(app.static_folder, "samples", os.path.basename(sample_id))
-            if not os.path.exists(sample_path):
-                return jsonify({"error": "Sample evidence file not found on disk."}), 404
-            
-            with open(sample_path, "rb") as f:
-                image_bytes = f.read()
-            source_name = sample_id
-            mode = request.json.get("mode", "neural_dce")
-
-        # Check for raw base64 upload
-        elif request.is_json and "image_base64" in request.json:
-            b64_data = request.json["image_base64"]
-            if "," in b64_data:
-                b64_data = b64_data.split(",", 1)[1]
-            try:
-                raw_bytes = base64.b64decode(b64_data)
-            except Exception:
-                return jsonify({"error": "Malformed base64 image data."}), 400
-
-            is_valid, err_msg = validate_image_payload(raw_bytes, "upload.png")
-            if not is_valid:
-                return jsonify({"error": err_msg}), 400
-
-            image_bytes = raw_bytes
-            mode = request.json.get("mode", "neural_dce")
-        else:
-            return jsonify({"error": "No image payload provided. Please upload a file or select a scenario."}), 400
-
-        if not image_bytes:
-            return jsonify({"error": "Received empty image data."}), 400
+        image_bytes, source_name, mode, err_msg = extract_image_payload_from_request(request)
+        if err_msg or not image_bytes:
+            return jsonify({"error": err_msg or "No image payload provided. Please upload a file or select a scenario."}), 400
 
         # Concurrency throttle: protect GPU/MPS memory from simultaneous saturation
         acquired = INFERENCE_SEMAPHORE.acquire(timeout=10.0)
@@ -288,7 +444,7 @@ def enhance_photo():
             return jsonify({"error": "Server is currently experiencing high processing volume. Please retry in a few seconds."}), 503
 
         try:
-            enhanced_bytes, metadata, orig_bgr, enh_bgr = enhancer.enhance(image_bytes, mode=mode)
+            enhanced_bytes, metadata, orig_bgr, enh_bgr = enhancer.enhance(image_bytes, mode=mode, source_name=source_name)
         finally:
             INFERENCE_SEMAPHORE.release()
 
@@ -312,7 +468,6 @@ def enhance_photo():
     except Exception:
         event_ref = uuid.uuid4().hex[:8]
         logger.exception(f"Internal enhancement fault [ref: {event_ref}]")
-        # Do not leak internal stack traces or filesystem paths to client
         return jsonify({
             "error": f"An error occurred during evidence enhancement (Event Ref: {event_ref}). The incident has been recorded to the audit log."
         }), 500
@@ -325,44 +480,16 @@ def get_proof_sheet():
         return jsonify({"error": "Rate limit exceeded. Please wait a moment before exporting."}), 429
 
     try:
-        image_bytes = None
-        mode = "neural_dce"
-
-        if "file" in request.files:
-            file = request.files["file"]
-            raw_bytes = file.read()
-            is_valid, err_msg = validate_image_payload(raw_bytes, file.filename)
-            if not is_valid:
-                return jsonify({"error": err_msg}), 400
-            image_bytes = raw_bytes
-            mode = request.form.get("mode", "neural_dce")
-        elif request.is_json and "sample_id" in request.json:
-            sample_id = request.json["sample_id"]
-            if sample_id not in VALID_SAMPLE_IDS:
-                return jsonify({"error": "Unauthorized sample identifier."}), 400
-            sample_path = os.path.join(app.static_folder, "samples", os.path.basename(sample_id))
-            with open(sample_path, "rb") as f:
-                image_bytes = f.read()
-            mode = request.json.get("mode", "neural_dce")
-        elif request.is_json and "image_base64" in request.json:
-            b64_data = request.json["image_base64"]
-            if "," in b64_data:
-                b64_data = b64_data.split(",", 1)[1]
-            raw_bytes = base64.b64decode(b64_data)
-            is_valid, err_msg = validate_image_payload(raw_bytes, "upload.png")
-            if not is_valid:
-                return jsonify({"error": err_msg}), 400
-            image_bytes = raw_bytes
-            mode = request.json.get("mode", "neural_dce")
-        else:
-            return jsonify({"error": "No image payload provided."}), 400
+        image_bytes, source_name, mode, err_msg = extract_image_payload_from_request(request)
+        if err_msg or not image_bytes:
+            return jsonify({"error": err_msg or "No image payload provided."}), 400
 
         acquired = INFERENCE_SEMAPHORE.acquire(timeout=10.0)
         if not acquired:
             return jsonify({"error": "Server busy. Please try again in a few moments."}), 503
 
         try:
-            enhanced_bytes, metadata, orig_bgr, enh_bgr = enhancer.enhance(image_bytes, mode=mode)
+            enhanced_bytes, metadata, orig_bgr, enh_bgr = enhancer.enhance(image_bytes, mode=mode, source_name=source_name)
             proof_sheet_bytes = enhancer.generate_proof_sheet(orig_bgr, enh_bgr, metadata)
         finally:
             INFERENCE_SEMAPHORE.release()
@@ -380,6 +507,7 @@ def get_proof_sheet():
 
 
 @app.route("/health", methods=["GET"])
+@app.route("/api/health", methods=["GET"])
 def health():
     import cv2
     import numpy as np
@@ -389,6 +517,7 @@ def health():
         "service": "ClaimClarity AI",
         "model": "ClaimDCE-Net",
         "trained_weights_loaded": enhancer.neural_model is not None,
+        "classifier_loaded": enhancer.classifier_model is not None,
         "device": str(enhancer.device),
         "pytorch_version": torch.__version__,
         "opencv_version": cv2.__version__,

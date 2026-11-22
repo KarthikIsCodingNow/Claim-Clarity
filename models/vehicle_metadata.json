@@ -1,0 +1,33 @@
+{
+  "classes": [
+    "Bus",
+    "Car",
+    "Truck",
+    "motorcycle"
+  ],
+  "class_details": {
+    "Bus": {
+      "code": "BUS",
+      "label": "COMMERCIAL BUS / TRANSIT COACH",
+      "category": "Commercial Transport"
+    },
+    "Car": {
+      "code": "CAR",
+      "label": "PASSENGER AUTOMOBILE (SEDAN / SUV / HATCHBACK)",
+      "category": "Passenger Automobile"
+    },
+    "Truck": {
+      "code": "TRUCK",
+      "label": "HEAVY FREIGHT TRUCK / CARGO HAULER",
+      "category": "Heavy Commercial"
+    },
+    "motorcycle": {
+      "code": "MOTORCYCLE",
+      "label": "MOTORCYCLE / TWO-WHEELER",
+      "category": "Two-Wheeled Motor Vehicle"
+    }
+  },
+  "num_classes": 4,
+  "final_accuracy": 67.25,
+  "device": "mps"
+}

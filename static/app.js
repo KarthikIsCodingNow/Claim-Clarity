@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const state = {
     selectedFile: null,
     selectedSampleId: null,
-    selectedMode: 'neural_dce', // 'neural_dce' | 'hybrid_forensic' | 'classic_clahe'
+    selectedMode: 'classic_clahe', // Default: classic_clahe | neural_dce | hybrid_forensic
     currentOriginalUrl: null,
     currentEnhancedUrl: null,
     currentMetadata: null,
@@ -71,9 +71,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnDownloadProof = document.getElementById('btn-download-proof');
   const btnDownloadOrig = document.getElementById('btn-download-orig');
 
+  const metricModel = document.getElementById('metric-model');
   const metricDim = document.getElementById('metric-dim');
   const metricTime = document.getElementById('metric-time');
   const metricHash = document.getElementById('metric-hash');
+
+  // Interactive Adjuster Sliders & Vehicle Recognition Elements
+  const sliderContrast = document.getElementById('slider-contrast');
+  const sliderSaturation = document.getElementById('slider-saturation');
+  const contrastValDisplay = document.getElementById('contrast-val-display');
+  const saturationValDisplay = document.getElementById('saturation-val-display');
+  const btnResetSliders = document.getElementById('btn-reset-sliders');
+  const vehicleRecognizedTitle = document.getElementById('vehicle-recognized-title');
+  const vehicleRecognizedSub = document.getElementById('vehicle-recognized-sub');
+  const vehicleRecognizedBadge = document.getElementById('vehicle-recognized-badge');
+
+  // Hero Section Cursor-Tracking Spotlight
+  const heroSection = document.querySelector('section');
+  const heroCursorSpot = document.getElementById('hero-cursor-spot');
 
   const btnShowAudit = document.getElementById('btn-show-audit');
   const navBtnAudit = document.getElementById('nav-btn-audit');
@@ -183,18 +198,68 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   }
 
-  // Mode Select Buttons
+  // Mode Select Buttons (Dark Brutalist Edition)
   const modeButtons = document.querySelectorAll('.mode-select-btn');
   modeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const mode = btn.getAttribute('data-mode');
       state.selectedMode = mode;
       modeButtons.forEach(b => {
-        b.className = 'mode-select-btn px-2.5 py-2 border border-[#1E1E1E] bg-transparent text-[#1E1E1E] hover:bg-[#D9D6D0] font-bold uppercase tracking-wider text-[11px] text-center transition-all';
+        b.className = 'mode-select-btn px-2.5 py-2 border border-[#383838] bg-transparent text-[#F5F5F0] hover:bg-[#222222] font-bold uppercase tracking-wider text-[11px] text-center transition-all';
       });
-      btn.className = 'mode-select-btn px-2.5 py-2 border border-[#1E1E1E] bg-[#1E1E1E] text-[#E4E2DD] font-bold uppercase tracking-wider text-[11px] text-center transition-all';
+      btn.className = 'mode-select-btn px-2.5 py-2 border border-[#DB4A2B] bg-[#DB4A2B] text-white font-bold uppercase tracking-wider text-[11px] text-center transition-all';
     });
   });
+
+  // Hero Section Cursor-Tracking Gradient Spotlight
+  if (heroSection && heroCursorSpot) {
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = heroSection.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      heroCursorSpot.style.left = `${x}px`;
+      heroCursorSpot.style.top = `${y}px`;
+    });
+  }
+
+  // Interactive Adjuster Sliders: Contrast & Saturation
+  let currentContrast = 100;
+  let currentSaturation = 100;
+
+  function updateImageFilters() {
+    const filterVal = `contrast(${currentContrast}%) saturate(${currentSaturation}%)`;
+    if (imgEnhanced) imgEnhanced.style.filter = filterVal;
+    if (imgEnhancedSide) imgEnhancedSide.style.filter = filterVal;
+    if (imgSinglePreview) imgSinglePreview.style.filter = filterVal;
+  }
+
+  if (sliderContrast && contrastValDisplay) {
+    sliderContrast.addEventListener('input', (e) => {
+      currentContrast = e.target.value;
+      contrastValDisplay.textContent = `${currentContrast}%`;
+      updateImageFilters();
+    });
+  }
+
+  if (sliderSaturation && saturationValDisplay) {
+    sliderSaturation.addEventListener('input', (e) => {
+      currentSaturation = e.target.value;
+      saturationValDisplay.textContent = `${currentSaturation}%`;
+      updateImageFilters();
+    });
+  }
+
+  if (btnResetSliders) {
+    btnResetSliders.addEventListener('click', () => {
+      currentContrast = 100;
+      currentSaturation = 100;
+      if (sliderContrast) sliderContrast.value = 100;
+      if (sliderSaturation) sliderSaturation.value = 100;
+      if (contrastValDisplay) contrastValDisplay.textContent = '100%';
+      if (saturationValDisplay) saturationValDisplay.textContent = '100%';
+      updateImageFilters();
+    });
+  }
 
   // Scenario / Product Card Selection
   productCards.forEach(card => {
@@ -272,7 +337,20 @@ document.addEventListener('DOMContentLoaded', () => {
     metricHash.textContent = '--';
 
     statusBadge.textContent = 'AWAITING INPUT';
-    statusBadge.className = 'px-2.5 py-0.5 bg-[#1E1E1E] text-[#E4E2DD] text-[10px] font-bold uppercase tracking-widest';
+    statusBadge.className = 'px-2.5 py-0.5 bg-[#1E1E1E] text-[#F5F5F0] text-[10px] font-bold uppercase tracking-widest border border-[#2D2D2D]';
+
+    currentContrast = 100;
+    currentSaturation = 100;
+    if (sliderContrast) sliderContrast.value = 100;
+    if (sliderSaturation) sliderSaturation.value = 100;
+    if (contrastValDisplay) contrastValDisplay.textContent = '100%';
+    if (saturationValDisplay) saturationValDisplay.textContent = '100%';
+    if (imgEnhanced) imgEnhanced.style.filter = '';
+    if (imgEnhancedSide) imgEnhancedSide.style.filter = '';
+    if (imgSinglePreview) imgSinglePreview.style.filter = '';
+    if (vehicleRecognizedTitle) vehicleRecognizedTitle.textContent = 'AWAITING EVIDENCE PHOTO';
+    if (vehicleRecognizedSub) vehicleRecognizedSub.textContent = 'Trained on multi-class vehicle dataset';
+    if (vehicleRecognizedBadge) vehicleRecognizedBadge.textContent = '-- %';
   }
 
   function showPreEnhancePreview(url) {
@@ -412,11 +490,78 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update status badge
     statusBadge.textContent = 'CLARITY ACTIVE';
     statusBadge.className = 'px-2.5 py-0.5 bg-[#DB4A2B] text-white text-[10px] font-bold uppercase tracking-widest';
+    if (metricModel) {
+      if (state.selectedMode === 'classic_clahe') {
+        metricModel.textContent = 'CLASSIC CLAHE (DETERMINISTIC)';
+      } else if (state.selectedMode === 'neural_dce') {
+        metricModel.textContent = 'CLAIMDCE-NET (TRAINED)';
+      } else {
+        metricModel.textContent = 'HYBRID FORENSIC (+SCRATCH)';
+      }
+    }
 
     // Populate metrics
     metricDim.textContent = `${w} × ${h} PX (1:1)`;
     metricTime.textContent = `${data.metadata.processing_time_ms} MS`;
     metricHash.textContent = data.metadata.enhanced_sha256.substring(0, 16) + '...';
+
+    // Populate Vehicle Recognized As (Powered by models/vehicle_recognition.pth)
+    const da = data.metadata.damage_assessment;
+    if (da) {
+      const vr = da.vehicle_recognized_as || {};
+      if (vehicleRecognizedTitle) {
+        vehicleRecognizedTitle.textContent = (vr.label || vr.class || da.vehicle_category || 'PASSENGER AUTOMOBILE').toUpperCase();
+      }
+      if (vehicleRecognizedSub) {
+        vehicleRecognizedSub.textContent = vr.class ? `Category: ${vr.class} • Multi-Class Neural Recognizer` : 'Trained on multi-class vehicle dataset';
+      }
+      if (vehicleRecognizedBadge) {
+        const conf = vr.confidence !== undefined ? vr.confidence : da.vehicle_confidence;
+        vehicleRecognizedBadge.textContent = conf !== undefined ? `${conf}% MATCH` : 'VERIFIED';
+      }
+    }
+
+    // Apply any active contrast or saturation slider values
+    updateImageFilters();
+
+    // Populate AI Multi-Task Forensic Dossier (Trained on GitHub & Kaggle Datasets)
+    if (da && da.available) {
+      const assessmentLabel = document.getElementById('assessment-label');
+      const assessmentDetail = document.getElementById('assessment-detail');
+      const assessmentPerspective = document.getElementById('assessment-perspective');
+      const assessmentType = document.getElementById('assessment-type');
+      const assessmentSeverity = document.getElementById('assessment-severity');
+      const assessmentSeverityDetail = document.getElementById('assessment-severity-detail');
+      const assessmentVehicle = document.getElementById('assessment-vehicle');
+      const assessmentVehicleConf = document.getElementById('assessment-vehicle-conf');
+      const assessmentDetection = document.getElementById('assessment-detection');
+      const assessmentDetectionConf = document.getElementById('assessment-detection-conf');
+      const assessmentConfBadge = document.getElementById('assessment-conf-badge');
+
+      if (assessmentLabel) assessmentLabel.textContent = da.label || 'ANALYZED';
+      if (assessmentDetail) assessmentDetail.textContent = da.detail || '';
+      if (assessmentPerspective) assessmentPerspective.textContent = da.perspective || '--';
+      if (assessmentType) assessmentType.textContent = da.damage_type || '--';
+      if (assessmentSeverity) {
+        assessmentSeverity.textContent = da.severity || '--';
+        assessmentSeverity.style.color = da.severity_color || '#DB4A2B';
+      }
+      if (assessmentSeverityDetail) {
+        assessmentSeverityDetail.textContent = da.severity_detail || (da.severity_confidence ? `${da.severity_confidence}% confidence` : '');
+      }
+      if (assessmentVehicle) assessmentVehicle.textContent = da.vehicle_category || '--';
+      if (assessmentVehicleConf && da.vehicle_confidence) {
+        assessmentVehicleConf.textContent = `${da.vehicle_confidence}% MATCH`;
+      }
+      if (assessmentDetection) assessmentDetection.textContent = da.accident_verification || '--';
+      if (assessmentDetectionConf && da.detection_confidence) {
+        assessmentDetectionConf.textContent = `${da.detection_confidence}% VERIFIED`;
+      }
+      if (assessmentConfBadge) {
+        assessmentConfBadge.textContent = `${da.confidence}% CONFIDENCE`;
+        assessmentConfBadge.className = 'px-2 py-0.5 bg-[#DB4A2B] text-white text-[9px] font-bold font-mono';
+      }
+    }
 
     // Show appropriate view
     if (state.viewMode === 'split') {
@@ -474,11 +619,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSplit(pct);
   });
 
-  // View Mode Switcher
+  // View Mode Switcher (Dark Brutalist Edition)
   viewModeSplit.addEventListener('click', () => {
     state.viewMode = 'split';
-    viewModeSplit.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#1E1E1E] text-[#E4E2DD] transition-all';
-    viewModeSide.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-transparent text-[#1E1E1E] hover:bg-[#D9D6D0] transition-all';
+    viewModeSplit.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#DB4A2B] text-white transition-all';
+    viewModeSide.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-transparent text-[#F5F5F0] hover:bg-[#222222] transition-all';
 
     if (state.currentEnhancedUrl) {
       splitView.classList.remove('hidden');
@@ -489,8 +634,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   viewModeSide.addEventListener('click', () => {
     state.viewMode = 'side';
-    viewModeSide.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#1E1E1E] text-[#E4E2DD] transition-all';
-    viewModeSplit.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-transparent text-[#1E1E1E] hover:bg-[#D9D6D0] transition-all';
+    viewModeSide.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#DB4A2B] text-white transition-all';
+    viewModeSplit.className = 'px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-transparent text-[#F5F5F0] hover:bg-[#222222] transition-all';
 
     if (state.currentEnhancedUrl) {
       splitView.classList.add('hidden');
@@ -664,9 +809,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!state.currentMetadata) {
       // Default info if not enhanced yet
       auditContent.innerHTML = `
-        <div class="p-4 border border-[#1E1E1E] bg-[#D9D6D0]">
-          <p class="font-clash font-bold uppercase text-sm">NO ENHANCED EVIDENCE CURRENTLY MOUNTED</p>
-          <p class="text-xs text-[#444444] mt-1">Select a scenario or upload an evidence photo to generate cryptographic SHA-256 hashes and latency benchmarks.</p>
+        <div class="p-4 border border-[#2D2D2D] bg-[#141414]">
+          <p class="font-clash font-bold uppercase text-sm text-[#F5F5F0]">NO ENHANCED EVIDENCE CURRENTLY MOUNTED</p>
+          <p class="text-xs text-[#8C8A85] mt-1">Select a scenario or upload an evidence photo to generate cryptographic SHA-256 hashes and latency benchmarks.</p>
         </div>
       `;
       auditModal.classList.remove('hidden');
@@ -676,18 +821,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const meta = state.currentMetadata;
     const modelSpecs = meta.model_specs || {};
     let stagesHtml = (meta.pipeline_stages || []).map(s => `
-      <div class="flex items-start space-x-3 p-3 border border-[#1E1E1E] bg-[#D9D6D0]">
+      <div class="flex items-start space-x-3 p-3 border border-[#2D2D2D] bg-[#141414]">
         <span class="px-2 py-0.5 bg-[#DB4A2B] text-white font-clash font-bold text-xs">${escapeHtml(s.step)}</span>
         <div>
-          <div class="font-clash font-bold text-sm uppercase text-[#1E1E1E]">${escapeHtml(s.title)}</div>
-          <div class="text-xs text-[#444444] mt-0.5">${escapeHtml(s.description)}</div>
+          <div class="font-clash font-bold text-sm uppercase text-[#F5F5F0]">${escapeHtml(s.title)}</div>
+          <div class="text-xs text-[#8C8A85] mt-0.5">${escapeHtml(s.description)}</div>
         </div>
       </div>
     `).join('');
 
     auditContent.innerHTML = `
       <!-- Model Training & Architecture Header -->
-      <div class="p-4 border-2 border-[#DB4A2B] bg-[#E4E2DD] space-y-2">
+      <div class="p-4 border-2 border-[#DB4A2B] bg-[#1E1E1E] space-y-2">
         <div class="flex items-center justify-between">
           <span class="px-2 py-0.5 bg-[#DB4A2B] text-white font-clash font-bold text-[10px] uppercase tracking-wider">
             DEEP LEARNING MODEL
@@ -696,51 +841,47 @@ document.addEventListener('DOMContentLoaded', () => {
             ACCELERATOR: ${escapeHtml(meta.device || 'MPS')}
           </span>
         </div>
-        <div class="font-clash font-bold text-lg uppercase text-[#1E1E1E]">
+        <div class="font-clash font-bold text-lg uppercase text-[#F5F5F0]">
           ${escapeHtml(modelSpecs.architecture || 'ClaimDCE-Net (Deep Curve Estimation Network)')}
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[10px] uppercase font-bold text-[#444444]">
-          <div>PARAMS: <span class="text-[#1E1E1E]">${escapeHtml(modelSpecs.parameters || '79,422')}</span></div>
-          <div>EPOCHS: <span class="text-[#1E1E1E]">${escapeHtml(modelSpecs.trained_epochs || '12')}</span></div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[10px] uppercase font-bold text-[#8C8A85]">
+          <div>PARAMS: <span class="text-[#F5F5F0]">${escapeHtml(modelSpecs.parameters || '79,422')}</span></div>
+          <div>EPOCHS: <span class="text-[#F5F5F0]">${escapeHtml(modelSpecs.trained_epochs || '12')}</span></div>
           <div>FINAL LOSS: <span class="text-[#DB4A2B]">${escapeHtml(modelSpecs.final_loss || '1.7275')}</span></div>
-          <div>DATASET: <span class="text-[#1E1E1E]">CAR DAMAGE (HF)</span></div>
+          <div>DATASET: <span class="text-[#F5F5F0]">CAR DAMAGE (HF)</span></div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 p-4 border border-[#1E1E1E] bg-[#D9D6D0]">
+      <div class="grid grid-cols-2 gap-4 p-4 border border-[#2D2D2D] bg-[#141414]">
         <div>
-          <span class="text-[10px] font-bold uppercase text-[#444444]">DIMENSION SPECIFICATION</span>
-          <div class="font-clash font-bold text-xl text-[#1E1E1E]">${escapeHtml(meta.dimensions?.width)} × ${escapeHtml(meta.dimensions?.height)} PX</div>
+          <span class="text-[10px] font-bold uppercase text-[#8C8A85]">DIMENSION SPECIFICATION</span>
+          <div class="font-clash font-bold text-xl text-[#F5F5F0]">${escapeHtml(meta.dimensions?.width)} × ${escapeHtml(meta.dimensions?.height)} PX</div>
           <span class="text-[10px] text-[#DB4A2B] font-bold uppercase">100% PRESERVED (0 CROPPING)</span>
         </div>
         <div>
-          <span class="text-[10px] font-bold uppercase text-[#444444]">INFERENCE TIME</span>
+          <span class="text-[10px] font-bold uppercase text-[#8C8A85]">INFERENCE TIME</span>
           <div class="font-clash font-bold text-xl text-[#DB4A2B] font-mono">${escapeHtml(meta.processing_time_ms)} MS</div>
-          <span class="text-[10px] text-[#444444] uppercase">PYTORCH METAL SHADERS</span>
+          <span class="text-[10px] text-[#8C8A85] uppercase">PYTORCH METAL SHADERS</span>
         </div>
       </div>
 
       <div class="space-y-2">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]">CRYPTOGRAPHIC CHAIN OF CUSTODY (SHA-256)</span>
-        <div class="p-3 border border-[#1E1E1E] bg-[#D9D6D0] font-mono text-[11px] space-y-1.5 break-all">
-          <div><strong class="text-[#1E1E1E]">ORIGINAL HASH:</strong> ${escapeHtml(meta.original_sha256)}</div>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-[#F5F5F0]">CRYPTOGRAPHIC CHAIN OF CUSTODY (SHA-256)</span>
+        <div class="p-3 border border-[#2D2D2D] bg-[#141414] font-mono text-[11px] space-y-1.5 break-all">
+          <div><strong class="text-[#F5F5F0]">ORIGINAL HASH:</strong> ${escapeHtml(meta.original_sha256)}</div>
           <div><strong class="text-[#DB4A2B]">ENHANCED HASH:</strong> ${escapeHtml(meta.enhanced_sha256)}</div>
         </div>
       </div>
 
       <div class="space-y-2">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]">DETERMINISTIC PIPELINE EXECUTION</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-[#F5F5F0]">DETERMINISTIC PIPELINE EXECUTION</span>
         <div class="space-y-2">
           ${stagesHtml}
         </div>
       </div>
 
-      <div class="p-4 border border-[#DB4A2B] bg-[#DB4A2B]/10 text-xs text-[#1E1E1E] leading-relaxed">
+      <div class="p-4 border border-[#DB4A2B] bg-[#DB4A2B]/10 text-xs text-[#F5F5F0] leading-relaxed">
         <strong class="font-clash uppercase font-bold text-[#DB4A2B]">REGULATORY CHARTER:</strong> ${escapeHtml(meta.disclaimer)}
-      </div>
-    `;
-    `;
-        <strong class="font-clash uppercase font-bold text-[#DB4A2B]">REGULATORY CHARTER:</strong> ${meta.disclaimer}
       </div>
     `;
 
@@ -755,20 +896,180 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === auditModal) auditModal.classList.add('hidden');
   });
 
-  // Search & Bag buttons (Brutalist interactions)
-  const btnQuickSearch = document.getElementById('btn-quick-search');
-  if (btnQuickSearch) {
-    btnQuickSearch.addEventListener('click', () => {
-      const grid = document.getElementById('product-grid');
-      if (grid) grid.scrollIntoView({ behavior: 'smooth' });
+  // ============================================================================
+  // Actuarial Claim Ledger Search Modal (50,000 Insurance Claim Records)
+  // ============================================================================
+  const claimSearchModal = document.getElementById('claim-search-modal');
+  const btnCloseClaimSearch = document.getElementById('btn-close-claim-search');
+  const btnDismissClaimSearch = document.getElementById('btn-dismiss-claim-search');
+  const claimSearchInput = document.getElementById('claim-search-input');
+  const claimSearchClear = document.getElementById('claim-search-clear');
+  const claimSearchResults = document.getElementById('claim-search-results');
+  const claimSearchSummary = document.getElementById('claim-search-summary');
+  const linkedClaimBadge = document.getElementById('linked-claim-badge');
+  const linkedClaimText = document.getElementById('linked-claim-text');
+  const btnUnlinkClaim = document.getElementById('btn-unlink-claim');
+
+  let activeLinkedClaim = null;
+  let searchDebounceTimeout = null;
+
+  function openClaimSearchModal() {
+    if (!claimSearchModal) return;
+    claimSearchModal.classList.remove('hidden');
+    if (claimSearchInput) {
+      claimSearchInput.focus();
+      if (!claimSearchInput.value.trim()) {
+        fetchClaimResults('Accident');
+      }
+    }
+  }
+
+  function closeClaimSearchModal() {
+    if (!claimSearchModal) return;
+    claimSearchModal.classList.add('hidden');
+  }
+
+  async function fetchClaimResults(query) {
+    if (!claimSearchResults) return;
+    claimSearchResults.innerHTML = `
+      <tr>
+        <td colspan="8" class="p-6 text-center text-[#8C8A85] font-medium">
+          Querying 50,000 actuarial ledger records...
+        </td>
+      </tr>
+    `;
+
+    try {
+      const res = await fetch(`/api/claims/search?q=${encodeURIComponent(query)}&limit=15`);
+      const data = await res.json();
+      const claims = data.claims || [];
+
+      if (claims.length === 0) {
+        claimSearchResults.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-6 text-center text-[#DB4A2B] font-bold">
+              No matching claim records found for "${escapeHtml(query)}".
+            </td>
+          </tr>
+        `;
+        if (claimSearchSummary) claimSearchSummary.textContent = `0 records matched in ledger.`;
+        return;
+      }
+
+      if (claimSearchSummary) {
+        claimSearchSummary.textContent = `Displaying top ${claims.length} of ${data.total_dataset_records || 50000} actuarial records.`;
+      }
+
+      claimSearchResults.innerHTML = claims.map(c => {
+        const fraudRisk = parseFloat(c.Fraud_Risk_Score || '0');
+        const fraudColor = fraudRisk > 75 ? 'text-[#DB4A2B] font-bold' : (fraudRisk > 40 ? 'text-[#F8A348] font-bold' : 'text-emerald-400 font-bold');
+        const statusBadge = c.Claim_Status === 'Approved' ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800' : 'bg-amber-950/80 text-amber-300 border border-amber-800';
+
+        return `
+          <tr class="hover:bg-[#222222] transition-colors">
+            <td class="p-3 font-mono font-bold text-[#F5F5F0]">${escapeHtml(c.Claim_ID)}</td>
+            <td class="p-3 font-mono text-[#8C8A85]">${escapeHtml(c.Policy_Number)}</td>
+            <td class="p-3 font-bold text-[#F5F5F0]">${escapeHtml(c.Claim_Type)}</td>
+            <td class="p-3 font-mono font-bold text-[#F5F5F0]">$${parseFloat(c.Claim_Amount || 0).toLocaleString()}</td>
+            <td class="p-3 font-mono ${fraudColor}">${fraudRisk.toFixed(1)} / 100</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 text-[10px] font-bold ${statusBadge}">${escapeHtml(c.Claim_Status)}</span>
+            </td>
+            <td class="p-3 font-mono text-[#8C8A85]">$${parseFloat(c.Settlement_Amount || 0).toLocaleString()}</td>
+            <td class="p-3 text-right">
+              <button 
+                class="btn-attach-claim px-2 py-1 bg-[#2D2D2D] text-[#F5F5F0] border border-[#383838] text-[10px] font-bold hover:bg-[#DB4A2B] hover:text-white transition-colors"
+                data-claim-id="${escapeHtml(c.Claim_ID)}"
+                data-policy="${escapeHtml(c.Policy_Number)}"
+                data-amount="${escapeHtml(c.Claim_Amount)}"
+                data-type="${escapeHtml(c.Claim_Type)}"
+              >
+                ATTACH
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Wire up attach buttons
+      claimSearchResults.querySelectorAll('.btn-attach-claim').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const claimId = btn.getAttribute('data-claim-id');
+          const policy = btn.getAttribute('data-policy');
+          const amount = parseFloat(btn.getAttribute('data-amount') || 0).toLocaleString();
+          const type = btn.getAttribute('data-type');
+
+          activeLinkedClaim = { claimId, policy, amount, type };
+          if (linkedClaimBadge && linkedClaimText) {
+            linkedClaimText.textContent = `${claimId} (${policy}) • $${amount} [${type}]`;
+            linkedClaimBadge.classList.remove('hidden');
+          }
+          closeClaimSearchModal();
+
+          const lab = document.getElementById('evidence-lab');
+          if (lab) lab.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+    } catch (err) {
+      claimSearchResults.innerHTML = `
+        <tr>
+          <td colspan="8" class="p-6 text-center text-[#DB4A2B] font-bold">
+            Failed to query actuarial records.
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  if (btnCloseClaimSearch) {
+    btnCloseClaimSearch.addEventListener('click', closeClaimSearchModal);
+  }
+  if (btnDismissClaimSearch) {
+    btnDismissClaimSearch.addEventListener('click', closeClaimSearchModal);
+  }
+  if (claimSearchModal) {
+    claimSearchModal.addEventListener('click', (e) => {
+      if (e.target === claimSearchModal) closeClaimSearchModal();
     });
   }
 
-  const btnQuickBag = document.getElementById('btn-quick-bag');
-  if (btnQuickBag) {
-    btnQuickBag.addEventListener('click', () => {
-      const lab = document.getElementById('evidence-lab');
-      if (lab) lab.scrollIntoView({ behavior: 'smooth' });
+  if (claimSearchInput) {
+    claimSearchInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (claimSearchClear) {
+        if (val) claimSearchClear.classList.remove('hidden');
+        else claimSearchClear.classList.add('hidden');
+      }
+      clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(() => {
+        fetchClaimResults(val);
+      }, 250);
+    });
+  }
+
+  if (claimSearchClear) {
+    claimSearchClear.addEventListener('click', () => {
+      claimSearchInput.value = '';
+      claimSearchClear.classList.add('hidden');
+      fetchClaimResults('Accident');
+    });
+  }
+
+  // Quick filter pills
+  document.querySelectorAll('.claim-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.getAttribute('data-filter');
+      if (claimSearchInput) claimSearchInput.value = filter;
+      if (claimSearchClear) claimSearchClear.classList.remove('hidden');
+      fetchClaimResults(filter);
+    });
+  });
+
+  if (btnUnlinkClaim) {
+    btnUnlinkClaim.addEventListener('click', () => {
+      activeLinkedClaim = null;
+      if (linkedClaimBadge) linkedClaimBadge.classList.add('hidden');
     });
   }
 

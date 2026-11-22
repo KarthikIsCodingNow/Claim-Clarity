@@ -1,0 +1,555 @@
+/* ==========================================================================
+   ClaimClarity AI - Circle-to-Enhance Lasso Content Styles
+   Raw Form Swiss Brutalist Design Language
+   Palette: #E4E2DD (Base), #1E1E1E (Charcoal), #DB4A2B (Safety Orange)
+   ========================================================================== */
+
+#claim-clarity-lens-root {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #1E1E1E !important;
+  box-sizing: border-box !important;
+}
+
+#claim-clarity-lens-root * {
+  box-sizing: border-box !important;
+}
+
+/* Canvas layer for glowing trail & cutout */
+#claim-clarity-trail-canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: crosshair !important;
+  display: block !important;
+}
+
+/* Top Instructional HUD Bar */
+.cc-top-hud {
+  position: absolute !important;
+  top: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #1E1E1E !important;
+  color: #E4E2DD !important;
+  padding: 10px 22px !important;
+  border: 1.5px solid #DB4A2B !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  font-family: 'Courier New', 'Consolas', monospace !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  pointer-events: auto !important;
+  animation: cc-fade-slide-down 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.cc-top-hud .cc-hud-dot {
+  width: 10px !important;
+  height: 10px !important;
+  background: #DB4A2B !important;
+  box-shadow: 0 0 12px #DB4A2B !important;
+  display: inline-block !important;
+  animation: cc-pulse-dot 1.2s infinite ease-in-out !important;
+}
+
+.cc-top-hud .cc-close-hint {
+  color: #8C8A85 !important;
+  font-size: 11px !important;
+  margin-left: 8px !important;
+}
+
+/* Floating Bounding Box Frame */
+.cc-bounding-box {
+  position: absolute !important;
+  pointer-events: none !important;
+  border: 2px solid #DB4A2B !important;
+  background: rgba(219, 74, 43, 0.04) !important;
+  box-shadow: 0 0 20px rgba(219, 74, 43, 0.3), inset 0 0 20px rgba(219, 74, 43, 0.15) !important;
+  transition: border-color 0.15s ease !important;
+}
+
+/* Swiss Brutalist Corner L-Brackets */
+.cc-corner {
+  position: absolute !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-color: #DB4A2B !important;
+  border-style: solid !important;
+}
+
+.cc-corner-tl {
+  top: -3px !important;
+  left: -3px !important;
+  border-width: 4px 0 0 4px !important;
+}
+
+.cc-corner-tr {
+  top: -3px !important;
+  right: -3px !important;
+  border-width: 4px 4px 0 0 !important;
+}
+
+.cc-corner-bl {
+  bottom: -3px !important;
+  left: -3px !important;
+  border-width: 0 0 4px 4px !important;
+}
+
+.cc-corner-br {
+  bottom: -3px !important;
+  right: -3px !important;
+  border-width: 0 4px 4px 0 !important;
+}
+
+/* Dimension Tag */
+.cc-dimension-tag {
+  position: absolute !important;
+  top: -26px !important;
+  left: 0 !important;
+  background: #1E1E1E !important;
+  color: #E4E2DD !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 3px 8px !important;
+  border: 1px solid #DB4A2B !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Animated Scanline Sweep */
+.cc-scanline {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, #DB4A2B, #FFFFFF, #DB4A2B, transparent) !important;
+  box-shadow: 0 0 12px #DB4A2B !important;
+  animation: cc-scan-sweep 2s linear infinite !important;
+}
+
+/* Floating Action Toolbar */
+.cc-action-bar {
+  position: absolute !important;
+  display: flex !important;
+  gap: 10px !important;
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  animation: cc-fade-up 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.cc-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  border: 2px solid #1E1E1E !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+  box-shadow: 3px 3px 0px #1E1E1E !important;
+}
+
+.cc-btn-confirm {
+  background: #DB4A2B !important;
+  color: #FFFFFF !important;
+  border-color: #DB4A2B !important;
+  box-shadow: 3px 3px 0px #1E1E1E !important;
+}
+
+.cc-btn-confirm:hover {
+  background: #C4381C !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0px #1E1E1E !important;
+}
+
+.cc-btn-confirm:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0px #1E1E1E !important;
+}
+
+.cc-btn-cancel {
+  background: #1E1E1E !important;
+  color: #E4E2DD !important;
+  border-color: #1E1E1E !important;
+}
+
+.cc-btn-cancel:hover {
+  background: #2D2D2D !important;
+  color: #FFFFFF !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0px #000000 !important;
+}
+
+.cc-btn-cancel:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0px #000000 !important;
+}
+
+/* Floating Processing Toast (Never captured in screenshot) */
+.cc-processing-toast {
+  position: fixed !important;
+  top: 24px !important;
+  right: 24px !important;
+  background: #1E1E1E !important;
+  color: #E4E2DD !important;
+  border: 2px solid #DB4A2B !important;
+  box-shadow: 6px 6px 0px #000000, 0 12px 32px rgba(0,0,0,0.4) !important;
+  padding: 14px 20px !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  font-family: 'Courier New', monospace !important;
+  animation: cc-slide-down-toast 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.cc-toast-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #DB4A2B !important;
+  letter-spacing: 0.08em !important;
+}
+
+.cc-toast-detail {
+  font-size: 10px !important;
+  color: #A09D95 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.cc-progress-bar-wrap {
+  width: 180px !important;
+  height: 6px !important;
+  background: #333 !important;
+  border: 1px solid #555 !important;
+  overflow: hidden !important;
+}
+
+.cc-progress-bar-fill {
+  width: 40% !important;
+  height: 100% !important;
+  background: #DB4A2B !important;
+  animation: cc-progress-indeterminate 1.4s infinite ease-in-out !important;
+}
+
+/* ==========================================================================
+   Floating On-Page Forensic Result Modal
+   ========================================================================== */
+.cc-result-modal {
+  position: fixed !important;
+  bottom: 28px !important;
+  right: 28px !important;
+  width: 520px !important;
+  max-width: calc(100vw - 56px) !important;
+  max-height: calc(100vh - 56px) !important;
+  background: #E4E2DD !important;
+  color: #1E1E1E !important;
+  border: 2.5px solid #1E1E1E !important;
+  box-shadow: 10px 10px 0px #1E1E1E, 0 20px 48px rgba(0,0,0,0.3) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  animation: cc-slide-up-modal 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.cc-modal-header {
+  background: #1E1E1E !important;
+  color: #E4E2DD !important;
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 2px solid #DB4A2B !important;
+}
+
+.cc-modal-title {
+  font-family: 'Courier New', monospace !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.cc-modal-title span.badge {
+  background: #DB4A2B !important;
+  color: #FFF !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+}
+
+.cc-modal-close-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #A09D95 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  padding: 0 4px !important;
+  line-height: 1 !important;
+  transition: color 0.15s ease !important;
+}
+
+.cc-modal-close-btn:hover {
+  color: #FFFFFF !important;
+}
+
+.cc-modal-body {
+  padding: 16px !important;
+  overflow-y: auto !important;
+  max-height: calc(100vh - 140px) !important;
+}
+
+/* Split Comparison Slider Container (Clip-Path Powered) */
+.cc-slider-container {
+  position: relative !important;
+  width: 100% !important;
+  height: 270px !important;
+  background: #141414 !important;
+  border: 1.5px solid #1E1E1E !important;
+  overflow: hidden !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  margin-bottom: 14px !important;
+}
+
+.cc-slider-layer,
+.cc-slider-layer-enhanced {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+}
+
+.cc-slider-layer img,
+.cc-slider-layer-enhanced img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  pointer-events: none !important;
+  -webkit-user-drag: none !important;
+}
+
+.cc-slider-layer-enhanced {
+  clip-path: inset(0 calc(100% - var(--slider-pos, 50%)) 0 0) !important;
+  -webkit-clip-path: inset(0 calc(100% - var(--slider-pos, 50%)) 0 0) !important;
+}
+
+.cc-slider-handle {
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: var(--slider-pos, 50%) !important;
+  width: 3px !important;
+  background: #DB4A2B !important;
+  cursor: ew-resize !important;
+  transform: translateX(-50%) !important;
+  z-index: 5 !important;
+  pointer-events: none !important;
+  box-shadow: 0 0 10px rgba(219, 74, 43, 0.8) !important;
+}
+
+.cc-split-range-input {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  cursor: ew-resize !important;
+  z-index: 10 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cc-slider-handle-knob {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 28px !important;
+  height: 28px !important;
+  background: #1E1E1E !important;
+  border: 2px solid #DB4A2B !important;
+  color: #FFFFFF !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: monospace !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+}
+
+.cc-pill-tag {
+  position: absolute !important;
+  bottom: 8px !important;
+  background: rgba(30, 30, 30, 0.85) !important;
+  color: #E4E2DD !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 3px 7px !important;
+  letter-spacing: 0.05em !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  z-index: 4 !important;
+}
+
+.cc-pill-left {
+  left: 8px !important;
+  border-left: 2px solid #DB4A2B !important;
+}
+
+.cc-pill-right {
+  right: 8px !important;
+  border-right: 2px solid #8C8A85 !important;
+}
+
+/* Metric Dossier Grid */
+.cc-metrics-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  margin-bottom: 14px !important;
+}
+
+.cc-metric-card {
+  background: #D9D6D0 !important;
+  border: 1px solid #1E1E1E !important;
+  padding: 8px 10px !important;
+}
+
+.cc-metric-label {
+  font-family: 'Courier New', monospace !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #555 !important;
+  margin-bottom: 4px !important;
+}
+
+.cc-metric-value {
+  font-family: 'Courier New', monospace !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #1E1E1E !important;
+}
+
+.cc-metric-delta {
+  font-size: 10px !important;
+  color: #DB4A2B !important;
+  font-weight: 700 !important;
+  margin-left: 4px !important;
+}
+
+/* Defect Appraisal Summary Card */
+.cc-appraisal-card {
+  background: #1E1E1E !important;
+  color: #E4E2DD !important;
+  border: 1.5px solid #1E1E1E !important;
+  padding: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+.cc-appraisal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 8px !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #8C8A85 !important;
+}
+
+.cc-appraisal-badge {
+  background: #DB4A2B !important;
+  color: #FFF !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.cc-appraisal-details {
+  display: flex !important;
+  gap: 16px !important;
+  font-size: 12px !important;
+}
+
+.cc-appraisal-item strong {
+  color: #DB4A2B !important;
+  font-family: monospace !important;
+}
+
+/* Modal Footer Actions */
+.cc-modal-footer {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+/* Keyframes */
+@keyframes cc-fade-slide-down {
+  from { opacity: 0; transform: translate(-50%, -15px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes cc-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cc-slide-up-modal {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cc-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes cc-scan-sweep {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes cc-progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(250%); }
+}
+
+@keyframes cc-slide-down-toast {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

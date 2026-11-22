@@ -1,14 +1,3 @@
-"""
-Generate realistic synthetic insurance claim sample photos for testing ClaimClarity AI.
-Includes 6 diverse claim scenarios:
-1. Low-light door scratch with camera sensor noise & deep shadow
-2. Windshield star fracture / stone chip crack with glare & haze
-3. Vehicle undercarriage / wheel arch suspension corrosion & impact in heavy shadow
-4. Metallic hood hail dent with subtle concave reflection
-5. Plastic bumper collision fracture and paint scuff
-6. Obscured VIN stamping / serial tag in dark engine bay
-"""
-
 import os
 import cv2
 import numpy as np

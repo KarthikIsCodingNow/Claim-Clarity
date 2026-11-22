@@ -1,8 +1,3 @@
-"""
-ClaimClarity AI - Deep Neural Enhancement Architecture
-Model: ClaimDCE-Net (Zero-Reference Deep Curve Estimation for Forensic Claim Photos)
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -73,6 +68,111 @@ class ClaimDCE_Net(nn.Module):
 
         enhanced = curr
         return enhanced, A
+
+
+class ClaimDamageClassifier(nn.Module):
+    """
+    Forensic Vehicle Damage Classifier trained on labeled vehicle damage dataset:
+    Classes (6):
+      0: F_Breakage (Front Headlamp / Windshield / Grille Fracture)
+      1: F_Crushed  (Front Bumper / Hood / Radiator Crush)
+      2: F_Normal   (Front Intact / Baseline)
+      3: R_Breakage (Rear Tail Lamp / Glass Fracture)
+      4: R_Crushed  (Rear Collision / Trunk Buckle)
+      5: R_Normal   (Rear Intact / Baseline)
+    """
+    def __init__(self, num_classes=6):
+        super(ClaimDamageClassifier, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1),   # 112x112
+            nn.BatchNorm2d(32),
+            nn.PReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),  # 56x56
+            nn.BatchNorm2d(64),
+            nn.PReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1), # 28x28
+            nn.BatchNorm2d(128),
+            nn.PReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1),# 14x14
+            nn.BatchNorm2d(256),
+            nn.PReLU(),
+            nn.AdaptiveAvgPool2d((1, 1))
+        )
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Dropout(0.35),
+            nn.Linear(256, 128),
+            nn.PReLU(),
+            nn.Linear(128, num_classes)
+        )
+
+    def forward(self, x):
+        feat = self.features(x)
+        logits = self.classifier(feat)
+        return logits
+
+
+class ClaimMultiTaskAssessor(nn.Module):
+    """
+    Unified Multi-Task Forensic Vehicle Accident & Damage Assessment Network.
+    Trained across multiple modalities & forms of data:
+      1. Damage Mode & Perspective (6 classes from Kaggle Vehicle Damage Inspection)
+      2. Accident Severity Level (3 classes: Fatal, Severe, Minor from GitHub Dataset)
+      3. Involved Vehicle Category (3 classes: Light Vehicle, Heavy Vehicle, Motorcycle)
+      4. Accident Verification (2 classes: Authentic Collision vs Ambient Non-Accident)
+    """
+    def __init__(self):
+        super(ClaimMultiTaskAssessor, self).__init__()
+        self.shared_features = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1),   # 112x112
+            nn.BatchNorm2d(32),
+            nn.PReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),  # 56x56
+            nn.BatchNorm2d(64),
+            nn.PReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1), # 28x28
+            nn.BatchNorm2d(128),
+            nn.PReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1),# 14x14
+            nn.BatchNorm2d(256),
+            nn.PReLU(),
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Dropout(0.3)
+        )
+        # Head 1: Damage Mode & Perspective (6 classes)
+        self.head_damage = nn.Sequential(
+            nn.Linear(256, 128),
+            nn.PReLU(),
+            nn.Linear(128, 6)
+        )
+        # Head 2: Severity (3 classes: 0=Fatal/Catastrophic, 1=Severe, 2=Minor)
+        self.head_severity = nn.Sequential(
+            nn.Linear(256, 64),
+            nn.PReLU(),
+            nn.Linear(64, 3)
+        )
+        # Head 3: Vehicle Type (3 classes: 0=Light Vehicle, 1=Heavy Vehicle, 2=Motorcycle)
+        self.head_vehicle = nn.Sequential(
+            nn.Linear(256, 64),
+            nn.PReLU(),
+            nn.Linear(64, 3)
+        )
+        # Head 4: Accident Detection (2 classes: 0=Accident Verified, 1=Non-Accident)
+        self.head_detection = nn.Sequential(
+            nn.Linear(256, 32),
+            nn.PReLU(),
+            nn.Linear(32, 2)
+        )
+
+    def forward(self, x):
+        feat = self.shared_features(x)
+        return {
+            "damage": self.head_damage(feat),
+            "severity": self.head_severity(feat),
+            "vehicle": self.head_vehicle(feat),
+            "detection": self.head_detection(feat)
+        }
 
 
 # ==============================================================================
@@ -177,3 +277,42 @@ class L_TV(nn.Module):
         count_h = (A.size(2) - 1) * A.size(3)
         count_w = A.size(2) * (A.size(3) - 1)
         return 2 * (h_tv / count_h + w_tv / count_w) / batch_size
+
+
+class ClaimVehicleRecognizer(nn.Module):
+    """
+    Forensic Vehicle Recognition Network trained on multi-class vehicle dataset:
+      0: Bus (Commercial Transit / Bus / Van)
+      1: Car (Passenger Automobile: Sedan / SUV / Coupe / Hatchback)
+      2: Truck (Freight Truck / Pickup / Heavy Transport)
+      3: Motorcycle (Two-Wheeler / Motorbike / Scooter)
+    """
+    def __init__(self, num_classes=4):
+        super(ClaimVehicleRecognizer, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(32),
+            nn.PReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.PReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(128),
+            nn.PReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(256),
+            nn.PReLU(),
+            nn.AdaptiveAvgPool2d((1, 1))
+        )
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
+            nn.PReLU(),
+            nn.Linear(128, num_classes)
+        )
+
+    def forward(self, x):
+        feat = self.features(x)
+        return self.classifier(feat)
+

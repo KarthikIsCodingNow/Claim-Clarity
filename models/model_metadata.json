@@ -1,104 +1,68 @@
 {
-  "model_architecture": "ClaimDCE-Net (Deep Curve Estimation Network)",
+  "model_architecture": "ClaimDCE-Net (Unified Multi-Dataset Trained)",
   "num_iterations": 8,
   "parameter_channels": 24,
   "total_parameters": 79422,
-  "trained_epochs": 12,
-  "training_time_seconds": 60.8,
-  "dataset_samples_count": 134,
-  "dataset_name": "Car Damage Vision Benchmark (HF/chittaranjankhatua/car_damage_pub + Synthetic Damaged Pairs)",
+  "trained_epochs": 5,
+  "training_time_seconds": 579.44,
+  "dataset_samples_count": 2500,
+  "total_imagery_pool": 21920,
+  "validation_samples_count": 300,
+  "datasets_used": [
+    "AccidentDetection-9k (Annotated Road Accident & Vehicle Collision Dataset)",
+    "GitHub Accident Images Analysis Dataset (Severity, Detection, Vehicles-in-Accidents)",
+    "Kaggle Labeled Vehicle Damage Inspection Dataset (F/R Breakage, Crushed, Normal)",
+    "Car Damage Vision Benchmark (HF/chittaranjankhatua/car_damage_pub)",
+    "Insurance Claims Actuarial Dataset (insurance_claims_dataset.csv)"
+  ],
   "accelerator": "Apple Silicon Metal Performance Shaders (MPS)",
-  "loss_weights": {
-    "spatial_consistency": 1.0,
-    "exposure_control": 10.0,
-    "color_constancy": 5.0,
-    "illumination_smoothness_tv": 200.0
-  },
-  "final_loss": 1.7275,
+  "final_train_loss": 1.2423,
+  "final_val_loss": 3.1318,
   "history": [
     {
       "epoch": 1,
-      "total_loss": 4.4714,
-      "spatial_loss": 0.0001,
-      "exposure_loss": 3.6323,
-      "tv_smoothness_loss": 0.6972
+      "train_loss": 2.9033,
+      "val_loss": 3.6568,
+      "spatial_loss": 0.0061,
+      "exposure_loss": 1.8072,
+      "tv_smoothness_loss": 0.8346,
+      "learning_rate": 9.1e-05
     },
     {
       "epoch": 2,
-      "total_loss": 4.0841,
-      "spatial_loss": 0.0007,
-      "exposure_loss": 3.2569,
-      "tv_smoothness_loss": 0.6579
+      "train_loss": 1.5863,
+      "val_loss": 3.3574,
+      "spatial_loss": 0.011,
+      "exposure_loss": 0.6612,
+      "tv_smoothness_loss": 0.6053,
+      "learning_rate": 6.9e-05
     },
     {
       "epoch": 3,
-      "total_loss": 3.3777,
-      "spatial_loss": 0.0044,
-      "exposure_loss": 2.2477,
-      "tv_smoothness_loss": 0.9183
+      "train_loss": 1.3504,
+      "val_loss": 3.1675,
+      "spatial_loss": 0.0126,
+      "exposure_loss": 0.5402,
+      "tv_smoothness_loss": 0.493,
+      "learning_rate": 4.1e-05
     },
     {
       "epoch": 4,
-      "total_loss": 3.037,
-      "spatial_loss": 0.0052,
-      "exposure_loss": 1.8641,
-      "tv_smoothness_loss": 0.9397
+      "train_loss": 1.2757,
+      "val_loss": 3.2205,
+      "spatial_loss": 0.0134,
+      "exposure_loss": 0.4942,
+      "tv_smoothness_loss": 0.4712,
+      "learning_rate": 1.9e-05
     },
     {
       "epoch": 5,
-      "total_loss": 2.5942,
-      "spatial_loss": 0.006,
-      "exposure_loss": 1.2736,
-      "tv_smoothness_loss": 1.0749
-    },
-    {
-      "epoch": 6,
-      "total_loss": 2.4297,
-      "spatial_loss": 0.0071,
-      "exposure_loss": 0.8648,
-      "tv_smoothness_loss": 1.3167
-    },
-    {
-      "epoch": 7,
-      "total_loss": 2.2928,
-      "spatial_loss": 0.0071,
-      "exposure_loss": 0.8331,
-      "tv_smoothness_loss": 1.183
-    },
-    {
-      "epoch": 8,
-      "total_loss": 2.1843,
-      "spatial_loss": 0.0072,
-      "exposure_loss": 0.844,
-      "tv_smoothness_loss": 1.0656
-    },
-    {
-      "epoch": 9,
-      "total_loss": 1.9995,
-      "spatial_loss": 0.0076,
-      "exposure_loss": 0.7454,
-      "tv_smoothness_loss": 0.9964
-    },
-    {
-      "epoch": 10,
-      "total_loss": 1.8428,
-      "spatial_loss": 0.0073,
-      "exposure_loss": 0.7393,
-      "tv_smoothness_loss": 0.8303
-    },
-    {
-      "epoch": 11,
-      "total_loss": 1.7053,
-      "spatial_loss": 0.0083,
-      "exposure_loss": 0.6506,
-      "tv_smoothness_loss": 0.7964
-    },
-    {
-      "epoch": 12,
-      "total_loss": 1.7275,
-      "spatial_loss": 0.0083,
-      "exposure_loss": 0.6809,
-      "tv_smoothness_loss": 0.7556
+      "train_loss": 1.2423,
+      "val_loss": 3.1318,
+      "spatial_loss": 0.0137,
+      "exposure_loss": 0.4705,
+      "tv_smoothness_loss": 0.4667,
+      "learning_rate": 1e-05
     }
   ]
 }

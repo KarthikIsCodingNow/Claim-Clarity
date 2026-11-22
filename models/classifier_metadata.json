@@ -1,0 +1,149 @@
+{
+  "model_architecture": "ClaimMultiTaskAssessor",
+  "total_parameters": 464630,
+  "tasks": {
+    "damage_mode": {
+      "classes": [
+        "F_Breakage",
+        "F_Crushed",
+        "F_Normal",
+        "R_Breakage",
+        "R_Crushed",
+        "R_Normal"
+      ],
+      "class_info": {
+        "F_Breakage": {
+          "perspective": "Front",
+          "damage_type": "Breakage",
+          "label": "FRONT IMPACT / BREAKAGE",
+          "detail": "Headlamp, windshield, or front grille fracture detected.",
+          "severity": "MODERATE",
+          "severity_color": "#F8A348"
+        },
+        "F_Crushed": {
+          "perspective": "Front",
+          "damage_type": "Crushed",
+          "label": "FRONT IMPACT / CRUSHED",
+          "detail": "Front bumper crumpling, hood deformation, or radiator support buckle.",
+          "severity": "CRITICAL",
+          "severity_color": "#DB4A2B"
+        },
+        "F_Normal": {
+          "perspective": "Front",
+          "damage_type": "Normal",
+          "label": "FRONT INTACT / NORMAL",
+          "detail": "Front fascia and panels intact without macro structural deformation.",
+          "severity": "NONE / BASELINE",
+          "severity_color": "#10B981"
+        },
+        "R_Breakage": {
+          "perspective": "Rear",
+          "damage_type": "Breakage",
+          "label": "REAR IMPACT / BREAKAGE",
+          "detail": "Tail lamp casing, rear windshield, or liftgate glass fracture.",
+          "severity": "MODERATE",
+          "severity_color": "#F8A348"
+        },
+        "R_Crushed": {
+          "perspective": "Rear",
+          "damage_type": "Crushed",
+          "label": "REAR COLLISION / CRUSHED",
+          "detail": "Rear bumper beam compression, trunk lid fold, or quarter panel buckle.",
+          "severity": "CRITICAL",
+          "severity_color": "#DB4A2B"
+        },
+        "R_Normal": {
+          "perspective": "Rear",
+          "damage_type": "Normal",
+          "label": "REAR INTACT / NORMAL",
+          "detail": "Rear bumper, valence, and liftgate intact without impact collapse.",
+          "severity": "NONE / BASELINE",
+          "severity_color": "#10B981"
+        }
+      },
+      "final_val_acc": 0.238
+    },
+    "accident_severity": {
+      "classes": [
+        "Level 1 (Fatal / Catastrophic)",
+        "Level 2 (Severe Collision)",
+        "Level 3 (Minor / Slight Damage)"
+      ],
+      "class_info": {
+        "0": {
+          "code": "FATAL_CATASTROPHIC",
+          "label": "LEVEL 1: FATAL / CATASTROPHIC LOSS",
+          "severity": "CRITICAL",
+          "color": "#DB4A2B",
+          "detail": "Total structural loss, vehicle rollover, or cab collapse."
+        },
+        "1": {
+          "code": "SEVERE_COLLISION",
+          "label": "LEVEL 2: SEVERE STRUCTURAL IMPACT",
+          "severity": "HIGH",
+          "color": "#F8A348",
+          "detail": "Major frame deformation, passenger compartment compromise, or heavy front/rear impact."
+        },
+        "2": {
+          "code": "MINOR_DAMAGE",
+          "label": "LEVEL 3: MINOR / SLIGHT DAMAGE",
+          "severity": "MODERATE",
+          "color": "#10B981",
+          "detail": "Cosmetic sheet metal abrasion, bumper scuff, or fender impact."
+        }
+      },
+      "final_val_acc": 0.656
+    },
+    "vehicle_category": {
+      "classes": [
+        "Light Vehicle (Car / SUV)",
+        "Heavy Vehicle (Truck / Bus)",
+        "Motorcycle (Two-Wheeler)"
+      ],
+      "class_info": {
+        "0": {
+          "code": "LIGHT_VEHICLE",
+          "label": "LIGHT VEHICLE (PASSENGER SEDAN / SUV / COUPE)",
+          "category": "Passenger Automobile"
+        },
+        "1": {
+          "code": "HEAVY_VEHICLE",
+          "label": "HEAVY VEHICLE (COMMERCIAL TRUCK / BUS)",
+          "category": "Commercial Transport"
+        },
+        "2": {
+          "code": "MOTORCYCLE",
+          "label": "MOTORCYCLE / TWO-WHEELER",
+          "category": "Motorcycle / Scooter"
+        }
+      },
+      "final_val_acc": 0.624
+    },
+    "accident_detection": {
+      "classes": [
+        "Accident Evidence Verified",
+        "Non-Accident / Ambient Traffic"
+      ],
+      "class_info": {
+        "0": {
+          "code": "ACCIDENT_CONFIRMED",
+          "label": "AUTHENTIC ACCIDENT EVIDENCE CONFIRMED",
+          "status": "VERIFIED"
+        },
+        "1": {
+          "code": "NON_ACCIDENT",
+          "label": "AMBIENT TRAFFIC / NO ACCIDENT DETECTED",
+          "status": "UNVERIFIED"
+        }
+      },
+      "final_val_acc": 0.873
+    }
+  },
+  "datasets_used": [
+    "Kaggle Labeled Vehicle Damage Inspection Dataset (6 classes)",
+    "GitHub Accident Images Analysis Dataset (Accident-Severity: Fatal, Severe, Minor)",
+    "GitHub Vehicles-in-Accidents (Light Vehicle, Heavy Vehicle, Motorcycle)",
+    "GitHub Accident -Detection (Collision Confirmed vs Ambient Traffic)"
+  ],
+  "training_time_seconds": 169.63
+}

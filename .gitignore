@@ -28,7 +28,7 @@ datasets/
 
 # Model checkpoints (large binary weights)
 models/*.pth
-!models/model_metadata.json
+!models/*.json
 
 # Operating System & Editor Files
 .DS_Store

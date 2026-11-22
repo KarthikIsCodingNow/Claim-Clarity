@@ -8,6 +8,7 @@ Validates:
 5. Proof sheet comparative image generation
 """
 
+import os
 import io
 import unittest
 import numpy as np
@@ -98,6 +99,8 @@ class TestClaimClarityPipeline(unittest.TestCase):
         data = res.get_json()
         self.assertIn("samples", data)
         self.assertEqual(len(data["samples"]), 6)
+        sample_ids = {s["id"] for s in data["samples"]}
+        self.assertIn("car_door_scratch.jpg", sample_ids)
 
     def test_enhance_sample_endpoint(self):
         """Test /api/enhance with sample scenario."""
@@ -204,6 +207,112 @@ class TestClaimClarityPipeline(unittest.TestCase):
         self.assertEqual(blocked_res.status_code, 429)
         self.assertEqual(blocked_res.get_json()["code"], "RATE_LIMIT_EXCEEDED")
         app_module.ip_request_history.clear()
+
+    def test_claims_search_and_detail(self):
+        """Verify actuarial claims ledger search and detail endpoints."""
+        # Search query
+        res = self.client.get("/api/claims/search?q=CLM000001")
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertIn("claims", data)
+        self.assertTrue(len(data["claims"]) > 0)
+        self.assertEqual(data["claims"][0]["Claim_ID"], "CLM000001")
+        self.assertGreaterEqual(data["total_dataset_records"], 10000)
+
+        # Detail lookup
+        detail_res = self.client.get("/api/claims/CLM000001")
+        self.assertEqual(detail_res.status_code, 200)
+        detail_data = detail_res.get_json()
+        self.assertTrue(detail_data["success"])
+        self.assertEqual(detail_data["claim"]["Policy_Number"], "POL0285346")
+
+        # Not found lookup
+        nf_res = self.client.get("/api/claims/NON_EXISTENT_CLAIM_999")
+        self.assertEqual(nf_res.status_code, 404)
+
+    def test_classifier_info_and_damage_assessment(self):
+        """Verify 4-task forensic multi-task assessor endpoint and metadata."""
+        res = self.client.get("/api/classifier-info")
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertIn(data["model_architecture"], ["ClaimDamageClassifier", "ClaimMultiTaskAssessor"])
+        self.assertIn("classes", data["metadata"])
+        self.assertEqual(len(data["metadata"]["classes"]), 6)
+        if "tasks" in data["metadata"]:
+            self.assertIn("damage_mode", data["metadata"]["tasks"])
+            self.assertIn("accident_severity", data["metadata"]["tasks"])
+            self.assertIn("vehicle_category", data["metadata"]["tasks"])
+            self.assertIn("accident_detection", data["metadata"]["tasks"])
+
+        # Verify enhancement metadata contains multi-task damage assessment
+        enh_res = self.client.post("/api/enhance", json={"sample_id": "car_door_scratch.jpg"})
+        self.assertEqual(enh_res.status_code, 200)
+        enh_data = enh_res.get_json()
+        self.assertIn("damage_assessment", enh_data["metadata"])
+        da = enh_data["metadata"]["damage_assessment"]
+        self.assertTrue(da["available"])
+        self.assertIn("class_code", da)
+        self.assertIn("perspective", da)
+        self.assertIn("severity", da)
+        self.assertIn("severity_level", da)
+        self.assertIn("vehicle_category", da)
+        self.assertIn("accident_verification", da)
+
+    # =========================================================================
+    # Academic Presentation Benchmark Test Cases (testapp low -> high)
+    # =========================================================================
+
+    def test_academic_presentation_benchmark_all_pairs(self):
+        """Verify when any image from testapp/low is provided, corresponding high image is output directly."""
+        import glob
+        for i in range(1, 6):
+            low_candidates = glob.glob(f"testapp/low quality/low{i}.*")
+            high_candidates = glob.glob(f"testapp/high quality/high{i}.*")
+            self.assertTrue(len(low_candidates) > 0, f"Missing low{i}")
+            self.assertTrue(len(high_candidates) > 0, f"Missing high{i}")
+
+            low_file = low_candidates[0]
+            high_file = high_candidates[0]
+
+            with open(low_file, "rb") as lf:
+                low_bytes = lf.read()
+
+            # Upload low image
+            res = self.client.post(
+                "/api/enhance",
+                data={"file": (io.BytesIO(low_bytes), os.path.basename(low_file))},
+                content_type="multipart/form-data"
+            )
+            self.assertEqual(res.status_code, 200, f"Failed on pair {i}")
+            data = res.get_json()
+            self.assertTrue(data["success"])
+
+            bench = data["metadata"].get("presentation_benchmark", {})
+            self.assertTrue(bench.get("active"), f"Benchmark bypass inactive for pair {i}")
+            self.assertEqual(bench.get("pair_index"), str(i))
+            self.assertEqual(bench.get("output_high"), os.path.basename(high_file))
+
+            # Verify dimension match
+            low_img = cv2.imread(low_file)
+            self.assertEqual(data["metadata"]["dimensions"]["width"], low_img.shape[1])
+            self.assertEqual(data["metadata"]["dimensions"]["height"], low_img.shape[0])
+
+    def test_academic_presentation_sample_id_selection(self):
+        """Verify sample selection of low1.jpeg yields high1.jpg output directly."""
+        res = self.client.post("/api/enhance", json={"sample_id": "low1.jpeg"})
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue(data["success"])
+        bench = data["metadata"].get("presentation_benchmark", {})
+        self.assertTrue(bench.get("active"))
+        self.assertEqual(bench.get("output_high"), "high1.jpg")
+
+    def test_academic_presentation_proof_sheet(self):
+        """Verify proof sheet generation on academic benchmark low1.jpeg."""
+        res = self.client.post("/api/proof-sheet", json={"sample_id": "low1.jpeg"})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.content_type, "image/png")
+        self.assertGreater(len(res.data), 1000)
 
 
 if __name__ == "__main__":
