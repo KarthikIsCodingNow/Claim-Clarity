@@ -76,40 +76,167 @@ body {
 }
 
 /* ==========================================================================
-   Hero Text Pixelation Resolution Animation
+   Universal Negative Filter Custom Cursor
    ========================================================================== */
-@keyframes heroPixelResolve {
-  0% {
-    filter: blur(16px) contrast(300%) drop-shadow(0 0 18px rgba(219,74,43,0.9));
-    letter-spacing: -0.1em;
-    opacity: 0.55;
-    transform: scale(0.96);
-  }
-  20% {
-    filter: blur(10px) contrast(240%);
-  }
-  45% {
-    filter: blur(5px) contrast(180%);
-    letter-spacing: -0.07em;
-  }
-  70% {
-    filter: blur(2px) contrast(130%);
-    letter-spacing: -0.055em;
-  }
-  85% {
-    filter: blur(0.8px) contrast(110%);
-  }
-  100% {
-    filter: blur(0px) contrast(100%);
-    letter-spacing: -0.05em;
-    opacity: 1;
-    transform: scale(1);
-  }
+html, body, a, button, input, select, textarea, [role="button"], label, .mode-select-btn, .product-card, .claim-filter-btn {
+  cursor: none !important;
 }
 
-.hero-pixel-resolve {
-  animation: heroPixelResolve 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: filter, transform;
+.site-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 9999999;
+  opacity: 0;
+  transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              margin 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease;
+  will-change: transform;
+}
+
+.site-cursor-dot.cursor-hover {
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  margin-left: -16px;
+}
+
+.site-cursor-dot.cursor-active {
+  transform: translate3d(var(--cx, 0px), var(--cy, 0px), 0) scale(0.75) !important;
+}
+
+/* ==========================================================================
+   Hero Section Map Radius / Tactical Lasso Lens
+   ========================================================================== */
+.hero-lens-radius {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 400px;
+  height: 400px;
+  margin-top: -200px;
+  margin-left: -200px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999998;
+  opacity: 0;
+  border: 1.5px dashed rgba(219, 74, 43, 0.75);
+  background: radial-gradient(circle, rgba(219, 74, 43, 0.22) 0%, rgba(219, 74, 43, 0.08) 55%, transparent 70%);
+  box-shadow: 0 0 35px rgba(219, 74, 43, 0.28), inset 0 0 30px rgba(219, 74, 43, 0.14);
+  transition: opacity 0.22s ease-out;
+  will-change: transform, opacity;
+}
+
+.hero-lens-radius .lens-inner-ring {
+  position: absolute;
+  inset: 50px;
+  border-radius: 50%;
+  border: 1px dotted rgba(219, 74, 43, 0.35);
+  pointer-events: none;
+}
+
+.hero-lens-radius .lens-crosshair-h {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(219, 74, 43, 0.6) 0%, transparent 20%, transparent 80%, rgba(219, 74, 43, 0.6) 100%);
+  pointer-events: none;
+}
+
+.hero-lens-radius .lens-crosshair-v {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(219, 74, 43, 0.6) 0%, transparent 20%, transparent 80%, rgba(219, 74, 43, 0.6) 100%);
+  pointer-events: none;
+}
+
+.hero-lens-radius .lens-hud-tag {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(18, 18, 18, 0.9);
+  border: 1px solid rgba(219, 74, 43, 0.7);
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #F5F5F0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hero-lens-radius .lens-hud-dot {
+  width: 5px;
+  height: 5px;
+  background-color: #DB4A2B;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+/* ==========================================================================
+   Hero Typographic Dual-Layer: Pixelated Mash Base + Map Radius Clarity Mask
+   ========================================================================== */
+.hero-headline-mash {
+  color: rgba(245, 245, 240, 0.38);
+  filter: blur(14px) contrast(280%) brightness(0.85);
+  text-shadow: 
+    -5px 0 0 rgba(219, 74, 43, 0.75),
+    5px 0 0 rgba(36, 181, 212, 0.65),
+    0 0 24px rgba(219, 74, 43, 0.5);
+  letter-spacing: -0.06em;
+  user-select: none;
+  transform: translateZ(0);
+  will-change: filter;
+}
+
+.hero-headline-clear {
+  color: #F5F5F0;
+  -webkit-mask-image: radial-gradient(circle 200px at var(--lasso-x, -9999px) var(--lasso-y, -9999px), black 0%, black 135px, rgba(0, 0, 0, 0.35) 175px, transparent 200px);
+  mask-image: radial-gradient(circle 200px at var(--lasso-x, -9999px) var(--lasso-y, -9999px), black 0%, black 135px, rgba(0, 0, 0, 0.35) 175px, transparent 200px);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  pointer-events: none;
+  user-select: none;
+  transform: translateZ(0);
+  will-change: mask-image, -webkit-mask-image;
+}
+
+/* Mobile & Touch Fallback */
+@media (hover: none) and (pointer: coarse) {
+  html, body, a, button, input, select, textarea {
+    cursor: auto !important;
+  }
+  .site-cursor-dot,
+  .hero-lens-radius {
+    display: none !important;
+  }
+  .hero-headline-clear {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+  .hero-headline-mash {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================

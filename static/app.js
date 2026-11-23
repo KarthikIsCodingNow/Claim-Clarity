@@ -86,9 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const vehicleRecognizedSub = document.getElementById('vehicle-recognized-sub');
   const vehicleRecognizedBadge = document.getElementById('vehicle-recognized-badge');
 
-  // Hero Section Cursor-Tracking Spotlight
-  const heroSection = document.querySelector('section');
+  // Hero Section Elements
+  const heroSection = document.getElementById('hero-section') || document.querySelector('section');
   const heroCursorSpot = document.getElementById('hero-cursor-spot');
+  const siteCursorDot = document.getElementById('site-cursor-dot');
+  const heroLensRadius = document.getElementById('hero-lens-radius');
+  const heroHeadlineWrapper = document.getElementById('hero-headline-wrapper');
+  const heroHeadlineClear = document.getElementById('hero-headline-clear');
 
   const btnShowAudit = document.getElementById('btn-show-audit');
   const navBtnAudit = document.getElementById('nav-btn-audit');
@@ -211,16 +215,125 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Hero Section Cursor-Tracking Gradient Spotlight
-  if (heroSection && heroCursorSpot) {
-    heroSection.addEventListener('mousemove', (e) => {
-      const rect = heroSection.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      heroCursorSpot.style.left = `${x}px`;
-      heroCursorSpot.style.top = `${y}px`;
-    });
+  // ==========================================================================
+  // Universal Negative Filter Dot Cursor & Hero Map Radius Lasso Lens
+  // ==========================================================================
+  let mouseX = -9999;
+  let mouseY = -9999;
+  let isCursorVisible = false;
+
+  function updateCursorPosition(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    if (!isCursorVisible) {
+      isCursorVisible = true;
+      if (siteCursorDot) siteCursorDot.style.opacity = '1';
+    }
+
+    // Move universal negative dot cursor (inverted filter)
+    if (siteCursorDot) {
+      siteCursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+      siteCursorDot.style.setProperty('--cx', `${mouseX}px`);
+      siteCursorDot.style.setProperty('--cy', `${mouseY}px`);
+    }
+
+    // Hero Section Map Radius & Clarifying Lasso Lens
+    if (heroSection) {
+      const heroRect = heroSection.getBoundingClientRect();
+      const inHeroY = mouseY >= heroRect.top && mouseY <= heroRect.bottom;
+      const heroVisible = heroRect.bottom > 80;
+
+      if (inHeroY && heroVisible) {
+        // Position and show map radius around cursor
+        if (heroLensRadius) {
+          heroLensRadius.style.opacity = '1';
+          heroLensRadius.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        }
+
+        // Ambient background glow spot follows cursor
+        if (heroCursorSpot) {
+          const relX = mouseX - heroRect.left;
+          const relY = mouseY - heroRect.top;
+          heroCursorSpot.style.left = `${relX}px`;
+          heroCursorSpot.style.top = `${relY}px`;
+        }
+
+        // Project lasso mask onto the hero headline
+        if (heroHeadlineWrapper && heroHeadlineClear) {
+          const wrapRect = heroHeadlineWrapper.getBoundingClientRect();
+          const lassoX = mouseX - wrapRect.left;
+          const lassoY = mouseY - wrapRect.top;
+          heroHeadlineClear.style.setProperty('--lasso-x', `${lassoX}px`);
+          heroHeadlineClear.style.setProperty('--lasso-y', `${lassoY}px`);
+        }
+      } else {
+        // Scrolled down past hero or outside hero section: hide map radius and reset mask
+        if (heroLensRadius) heroLensRadius.style.opacity = '0';
+        if (heroHeadlineClear) {
+          heroHeadlineClear.style.setProperty('--lasso-x', '-9999px');
+          heroHeadlineClear.style.setProperty('--lasso-y', '-9999px');
+        }
+      }
+    }
   }
+
+  window.addEventListener('mousemove', updateCursorPosition, { passive: true });
+
+  window.addEventListener('scroll', () => {
+    if (heroSection) {
+      const heroRect = heroSection.getBoundingClientRect();
+      if (heroRect.bottom <= 80) {
+        if (heroLensRadius) heroLensRadius.style.opacity = '0';
+        if (heroHeadlineClear) {
+          heroHeadlineClear.style.setProperty('--lasso-x', '-9999px');
+          heroHeadlineClear.style.setProperty('--lasso-y', '-9999px');
+        }
+      } else if (mouseY >= heroRect.top && mouseY <= heroRect.bottom) {
+        if (heroLensRadius) heroLensRadius.style.opacity = '1';
+        if (heroHeadlineWrapper && heroHeadlineClear) {
+          const wrapRect = heroHeadlineWrapper.getBoundingClientRect();
+          const lassoX = mouseX - wrapRect.left;
+          const lassoY = mouseY - wrapRect.top;
+          heroHeadlineClear.style.setProperty('--lasso-x', `${lassoX}px`);
+          heroHeadlineClear.style.setProperty('--lasso-y', `${lassoY}px`);
+        }
+      }
+    }
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', () => {
+    isCursorVisible = false;
+    if (siteCursorDot) siteCursorDot.style.opacity = '0';
+    if (heroLensRadius) heroLensRadius.style.opacity = '0';
+  });
+
+  document.addEventListener('mouseenter', () => {
+    isCursorVisible = true;
+    if (siteCursorDot) siteCursorDot.style.opacity = '1';
+  });
+
+  document.addEventListener('mousedown', () => {
+    if (siteCursorDot) siteCursorDot.classList.add('cursor-active');
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (siteCursorDot) siteCursorDot.classList.remove('cursor-active');
+  });
+
+  // Attach hover state to interactive elements across the site
+  const interactiveSelector = 'a, button, input, select, textarea, [role="button"], label, .mode-select-btn, .product-card, .claim-filter-btn, .tab-btn';
+  document.addEventListener('mouseover', (e) => {
+    if (siteCursorDot && e.target.closest(interactiveSelector)) {
+      siteCursorDot.classList.add('cursor-hover');
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    if (siteCursorDot && e.target.closest(interactiveSelector)) {
+      siteCursorDot.classList.remove('cursor-hover');
+    }
+  });
 
   // Interactive Adjuster Sliders: Contrast & Saturation
   let currentContrast = 100;
