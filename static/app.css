@@ -115,95 +115,32 @@ html, body, a, button, input, select, textarea, [role="button"], label, .mode-se
 }
 
 /* ==========================================================================
-   Hero Section Map Radius / Tactical Lasso Lens
+   Hero Section Subtle Gradient Radius (Soft Ambient Halo)
    ========================================================================== */
 .hero-lens-radius {
   position: fixed;
   top: 0;
   left: 0;
-  width: 400px;
-  height: 400px;
-  margin-top: -200px;
-  margin-left: -200px;
+  width: 340px;
+  height: 340px;
+  margin-top: -170px;
+  margin-left: -170px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 999998;
   opacity: 0;
-  border: 1.5px dashed rgba(219, 74, 43, 0.75);
-  background: radial-gradient(circle, rgba(219, 74, 43, 0.22) 0%, rgba(219, 74, 43, 0.08) 55%, transparent 70%);
-  box-shadow: 0 0 35px rgba(219, 74, 43, 0.28), inset 0 0 30px rgba(219, 74, 43, 0.14);
-  transition: opacity 0.22s ease-out;
+  background: radial-gradient(circle, rgba(219, 74, 43, 0.16) 0%, rgba(219, 74, 43, 0.05) 50%, transparent 70%);
+  transition: opacity 0.28s ease-out;
   will-change: transform, opacity;
 }
 
-.hero-lens-radius .lens-inner-ring {
-  position: absolute;
-  inset: 50px;
-  border-radius: 50%;
-  border: 1px dotted rgba(219, 74, 43, 0.35);
-  pointer-events: none;
-}
-
-.hero-lens-radius .lens-crosshair-h {
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  right: 10px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(219, 74, 43, 0.6) 0%, transparent 20%, transparent 80%, rgba(219, 74, 43, 0.6) 100%);
-  pointer-events: none;
-}
-
-.hero-lens-radius .lens-crosshair-v {
-  position: absolute;
-  left: 50%;
-  top: 10px;
-  bottom: 10px;
-  width: 1px;
-  background: linear-gradient(180deg, rgba(219, 74, 43, 0.6) 0%, transparent 20%, transparent 80%, rgba(219, 74, 43, 0.6) 100%);
-  pointer-events: none;
-}
-
-.hero-lens-radius .lens-hud-tag {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  background: rgba(18, 18, 18, 0.9);
-  border: 1px solid rgba(219, 74, 43, 0.7);
-  font-family: 'Space Mono', monospace;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  color: #F5F5F0;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.hero-lens-radius .lens-hud-dot {
-  width: 5px;
-  height: 5px;
-  background-color: #DB4A2B;
-  border-radius: 50%;
-  animation: pulse 1.5s infinite;
-}
-
 /* ==========================================================================
-   Hero Typographic Dual-Layer: Pixelated Mash Base + Map Radius Clarity Mask
+   Hero Typographic Dual-Layer: Pixelated Mash Base + Subtle Clarity Mask
    ========================================================================== */
 .hero-headline-mash {
-  color: rgba(245, 245, 240, 0.38);
-  filter: blur(14px) contrast(280%) brightness(0.85);
-  text-shadow: 
-    -5px 0 0 rgba(219, 74, 43, 0.75),
-    5px 0 0 rgba(36, 181, 212, 0.65),
-    0 0 24px rgba(219, 74, 43, 0.5);
-  letter-spacing: -0.06em;
+  color: rgba(245, 245, 240, 0.32);
+  filter: blur(8px) contrast(170%);
+  letter-spacing: -0.05em;
   user-select: none;
   transform: translateZ(0);
   will-change: filter;
@@ -211,8 +148,8 @@ html, body, a, button, input, select, textarea, [role="button"], label, .mode-se
 
 .hero-headline-clear {
   color: #F5F5F0;
-  -webkit-mask-image: radial-gradient(circle 200px at var(--lasso-x, -9999px) var(--lasso-y, -9999px), black 0%, black 135px, rgba(0, 0, 0, 0.35) 175px, transparent 200px);
-  mask-image: radial-gradient(circle 200px at var(--lasso-x, -9999px) var(--lasso-y, -9999px), black 0%, black 135px, rgba(0, 0, 0, 0.35) 175px, transparent 200px);
+  -webkit-mask-image: radial-gradient(circle 220px at var(--lasso-x, -9999px) var(--lasso-y, -9999px), rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.88) 70px, rgba(0, 0, 0, 0.35) 140px, transparent 220px);
+  mask-image: radial-gradient(circle 220px at var(--lasso-x, -9999px) var(--lasso-y, -9999px), rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.88) 70px, rgba(0, 0, 0, 0.35) 140px, transparent 220px);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   pointer-events: none;
